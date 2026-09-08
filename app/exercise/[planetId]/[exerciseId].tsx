@@ -17,6 +17,7 @@ import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
 import { Play, Pause, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react-native';
+import { ExerciseVideo } from '@/components/ExerciseVideo';
 
 import * as ExpoHaptics from 'expo-haptics';
 const Haptics = Platform.OS !== 'web' ? ExpoHaptics : null;
@@ -263,6 +264,13 @@ export default function ExerciseScreen() {
             <Text style={[styles.repsValue, { color: planet.color }]}>{durationText}</Text>
           </View>
         </View>
+
+        {/* Video demonstration */}
+        {exercise.videoUrl && (
+          <View style={styles.card}>
+            <ExerciseVideo uri={exercise.videoUrl} planetColor={planet.color} />
+          </View>
+        )}
 
         {/* Parent tip card */}
         <View style={styles.card}>

@@ -7,6 +7,7 @@ export interface Exercise {
   parentTip: string;
   emoji: string;
   adaptations: string[];
+  videoUrl?: string;
 }
 
 export interface Planet {
@@ -45,6 +46,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений зрения: держитесь за руки',
           'Для нарушений слуха: показывайте движение визуально',
         ],
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'moon-2',
@@ -126,6 +128,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: приседать у стены с поддержкой',
           'Для нарушений зрения: держитесь за стул',
         ],
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'earth-2',
@@ -278,6 +281,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: следить за движениями визуально',
           'Для нарушений зрения: хлопать по рукам родителя',
         ],
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'mars-2',
@@ -430,6 +434,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивное растяжение с помощью родителя',
           'Для нарушений зрения: описывайте движение',
         ],
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'jupiter-2',
@@ -581,6 +586,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: показывайте счёт на пальцах',
           'Для тревожных детей: начните с более коротких задержек',
         ],
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'neptune-2',
@@ -724,6 +730,7 @@ export const PLANETS: Planet[] = [
           'Для всех: главное — расслабление',
           'Для нарушений зрения: описывайте образ звезды',
         ],
+        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'final-2',

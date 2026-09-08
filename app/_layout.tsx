@@ -14,6 +14,7 @@ import {
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { RocketLoader } from "@/components/RocketLoader";
 import { ProgressProvider } from "@/contexts/ProgressContext";
 import { MusicProvider } from "@/contexts/MusicContext";
 import {
@@ -63,7 +64,7 @@ export default function RootLayout() {
   };
 
   if (!fontsLoaded) {
-    return null;
+    return <RocketLoader />;
   }
 
   return (

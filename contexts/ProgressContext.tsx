@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import {
   loadTotalStars,
   saveTotalStars,
@@ -26,6 +27,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [planetProgress, setPlanetProgress] = useState<PlanetProgressMap>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Keep refs so the AppState handler always sees the latest values
+  const totalStarsRef = useRef(totalStars);
+  const planetProgressRef = useRef(planetProgress);
+  useEffect(() => { totalStarsRef.current = totalStars; }, [totalStars]);
+  useEffect(() => { planetProgressRef.current = planetProgress; }, [planetProgress]);
+
   useEffect(() => {
     async function load() {
       const [stars, progress] = await Promise.all([
@@ -37,6 +44,21 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       setIsLoaded(true);
     }
     load();
+  }, []);
+
+  // Flush progress to storage when app goes to background or becomes inactive
+  useEffect(() => {
+    const handler = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        console.log(`[ProgressContext] AppState changed to ${nextAppState}, flushing progress to storage`);
+        saveTotalStars(totalStarsRef.current);
+        savePlanetProgress(planetProgressRef.current);
+      }
+    };
+    const subscription = AppState.addEventListener('change', handler);
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   const completeExercise = useCallback(
