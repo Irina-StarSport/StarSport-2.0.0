@@ -40,8 +40,7 @@
       "expo-web-browser",
       "expo-secure-store",
       "expo-audio",
-      "expo-document-picker",
-      "expo-video"
+      "expo-document-picker"
     ],
     "scheme": "starsport",
     "experiments": {

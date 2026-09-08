@@ -5,6 +5,7 @@ import {
   FlatList,
   StyleSheet,
   Animated,
+  Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -106,7 +107,15 @@ export default function PlanetScreen() {
                   },
                 ]}
               >
-                <Text style={styles.planetEmoji}>{planet.emoji}</Text>
+                {planet.imageUrl ? (
+                  <Image
+                    source={{ uri: planet.imageUrl }}
+                    style={{ width: 80, height: 80, borderRadius: 40 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Text style={styles.planetEmoji}>{planet.emoji}</Text>
+                )}
               </View>
               <Text style={[styles.planetName, { color: planet.color }]}>
                 {planet.name}

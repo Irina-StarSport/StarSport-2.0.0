@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { Planet } from '@/constants/planets';
@@ -78,7 +78,15 @@ export function PlanetCard({
           <View style={styles.row}>
             {/* Planet emoji */}
             <View style={[styles.emojiContainer, { backgroundColor: planet.color + '20' }]}>
-              <Text style={styles.emoji}>{planet.emoji}</Text>
+              {planet.imageUrl ? (
+                <Image
+                  source={{ uri: planet.imageUrl }}
+                  style={styles.planetImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text style={styles.emoji}>{planet.emoji}</Text>
+              )}
             </View>
 
             {/* Info */}
@@ -159,6 +167,11 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 36,
+  },
+  planetImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
   info: {
     flex: 1,

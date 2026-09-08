@@ -7,7 +7,6 @@ export interface Exercise {
   parentTip: string;
   emoji: string;
   adaptations: string[];
-  videoUrl?: string;
 }
 
 export interface Planet {
@@ -20,6 +19,7 @@ export interface Planet {
   exercises: Exercise[];
   starsReward: number;
   unlockAfter?: string;
+  imageUrl?: string;
 }
 
 export const PLANETS: Planet[] = [
@@ -46,7 +46,6 @@ export const PLANETS: Planet[] = [
           'Для нарушений зрения: держитесь за руки',
           'Для нарушений слуха: показывайте движение визуально',
         ],
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'moon-2',
@@ -128,7 +127,6 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: приседать у стены с поддержкой',
           'Для нарушений зрения: держитесь за стул',
         ],
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'earth-2',
@@ -267,6 +265,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,87,34,0.4)',
     starsReward: 2,
     unlockAfter: 'earth',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/600px-OSIRIS_Mars_true_color.jpg',
     exercises: [
       {
         id: 'mars-1',
@@ -281,7 +280,6 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: следить за движениями визуально',
           'Для нарушений зрения: хлопать по рукам родителя',
         ],
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'mars-2',
@@ -420,6 +418,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,152,0,0.4)',
     starsReward: 3,
     unlockAfter: 'mars',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/600px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg',
     exercises: [
       {
         id: 'jupiter-1',
@@ -434,7 +433,6 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивное растяжение с помощью родителя',
           'Для нарушений зрения: описывайте движение',
         ],
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'jupiter-2',
@@ -573,6 +571,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(33,150,243,0.4)',
     starsReward: 3,
     unlockAfter: 'jupiter',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Neptune_Voyager2_color_calibrated.png/600px-Neptune_Voyager2_color_calibrated.png',
     exercises: [
       {
         id: 'neptune-1',
@@ -586,7 +585,6 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: показывайте счёт на пальцах',
           'Для тревожных детей: начните с более коротких задержек',
         ],
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'neptune-2',
@@ -730,7 +728,6 @@ export const PLANETS: Planet[] = [
           'Для всех: главное — расслабление',
           'Для нарушений зрения: описывайте образ звезды',
         ],
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       },
       {
         id: 'final-2',

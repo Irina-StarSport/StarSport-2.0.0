@@ -17,7 +17,6 @@ import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
 import { Play, Pause, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react-native';
-import { ExerciseVideo } from '@/components/ExerciseVideo';
 
 import * as ExpoHaptics from 'expo-haptics';
 const Haptics = Platform.OS !== 'web' ? ExpoHaptics : null;
@@ -265,13 +264,6 @@ export default function ExerciseScreen() {
           </View>
         </View>
 
-        {/* Video demonstration */}
-        {exercise.videoUrl && (
-          <View style={styles.card}>
-            <ExerciseVideo uri={exercise.videoUrl} planetColor={planet.color} />
-          </View>
-        )}
-
         {/* Parent tip card */}
         <View style={styles.card}>
           <AnimatedPressable
@@ -324,16 +316,42 @@ export default function ExerciseScreen() {
             </View>
           </AnimatedPressable>
         ) : (
-          <AnimatedPressable
-            onPress={handleBack}
-            style={styles.completeButton}
-            accessibilityLabel="Вернуться к планете"
-            accessibilityRole="button"
-          >
-            <View style={[styles.completeButtonInner, { backgroundColor: COLORS.success }]}>
-              <Text style={styles.completeButtonText}>Вернуться к планете 🚀</Text>
-            </View>
-          </AnimatedPressable>
+          <View style={styles.completedButtons}>
+            {(() => {
+              const currentIndex = planet.exercises.findIndex((e) => e.id === exerciseId);
+              const hasNext = currentIndex >= 0 && currentIndex + 1 < planet.exercises.length;
+              const nextExercise = hasNext ? planet.exercises[currentIndex + 1] : null;
+              return (
+                <>
+                  {nextExercise && (
+                    <AnimatedPressable
+                      onPress={() => {
+                        console.log(`[ExerciseScreen] next exercise pressed: ${nextExercise.id}`);
+                        router.replace(`/exercise/${planetId}/${nextExercise.id}`);
+                      }}
+                      style={styles.completeButton}
+                      accessibilityLabel="Следующее упражнение"
+                      accessibilityRole="button"
+                    >
+                      <View style={[styles.completeButtonInner, { backgroundColor: planet.color }]}>
+                        <Text style={styles.completeButtonText}>Следующее упражнение →</Text>
+                      </View>
+                    </AnimatedPressable>
+                  )}
+                  <AnimatedPressable
+                    onPress={handleBack}
+                    style={styles.completeButton}
+                    accessibilityLabel="Вернуться к планете"
+                    accessibilityRole="button"
+                  >
+                    <View style={[styles.completeButtonInner, { backgroundColor: COLORS.surfaceSecondary }]}>
+                      <Text style={[styles.completeButtonText, { color: COLORS.text }]}>Вернуться к планете 🚀</Text>
+                    </View>
+                  </AnimatedPressable>
+                </>
+              );
+            })()}
+          </View>
         )}
       </ScrollView>
 
@@ -541,8 +559,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     lineHeight: 20,
   },
-  completeButton: {
+  completedButtons: {
+    gap: 12,
     marginTop: 4,
+  },
+  completeButton: {
+    marginTop: 0,
   },
   completeButtonInner: {
     borderRadius: 16,
