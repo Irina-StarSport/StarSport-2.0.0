@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -26,6 +26,7 @@ export default function PlanetScreen() {
 
   const heroOpacity = useRef(new Animated.Value(0)).current;
   const heroScale = useRef(new Animated.Value(0.8)).current;
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     console.log(`[PlanetScreen] mounted: planet=${id}`);
@@ -107,11 +108,12 @@ export default function PlanetScreen() {
                   },
                 ]}
               >
-                {planet.imageUrl ? (
+                {planet.imageUrl && !imageError ? (
                   <Image
                     source={{ uri: planet.imageUrl }}
                     style={{ width: 80, height: 80, borderRadius: 40 }}
                     resizeMode="cover"
+                    onError={() => setImageError(true)}
                   />
                 ) : (
                   <Text style={styles.planetEmoji}>{planet.emoji}</Text>

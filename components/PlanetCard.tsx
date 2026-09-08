@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
@@ -24,6 +24,7 @@ export function PlanetCard({
 }: PlanetCardProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -78,11 +79,12 @@ export function PlanetCard({
           <View style={styles.row}>
             {/* Planet emoji */}
             <View style={[styles.emojiContainer, { backgroundColor: planet.color + '20' }]}>
-              {planet.imageUrl ? (
+              {planet.imageUrl && !imageError ? (
                 <Image
                   source={{ uri: planet.imageUrl }}
                   style={styles.planetImage}
                   resizeMode="cover"
+                  onError={() => setImageError(true)}
                 />
               ) : (
                 <Text style={styles.emoji}>{planet.emoji}</Text>

@@ -17,6 +17,7 @@ import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
 import { Play, Pause, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react-native';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
 import * as ExpoHaptics from 'expo-haptics';
 const Haptics = Platform.OS !== 'web' ? ExpoHaptics : null;
@@ -41,10 +42,16 @@ export default function ExerciseScreen() {
 
   const completionScale = useRef(new Animated.Value(0)).current;
   const completionOpacity = useRef(new Animated.Value(0)).current;
+  const confettiRef = useRef<any>(null);
 
   const alreadyCompleted = planet && exercise
     ? isExerciseCompleted(planet.id, exercise.id)
     : false;
+
+  const isFinalLastExercise =
+    planetId === 'final' &&
+    planet !== undefined &&
+    planet.exercises[planet.exercises.length - 1]?.id === exerciseId;
 
   useEffect(() => {
     console.log(`[ExerciseScreen] mounted: planet=${planetId}, exercise=${exerciseId}`);
@@ -87,7 +94,11 @@ export default function ExerciseScreen() {
     if (!alreadyCompleted) {
       completeExercise(planet.id, exercise.id, planet.starsReward);
     }
-  }, [planet, exercise, alreadyCompleted, completeExercise, completionScale, completionOpacity]);
+
+    if (isFinalLastExercise && confettiRef.current) {
+      confettiRef.current.start();
+    }
+  }, [planet, exercise, alreadyCompleted, completeExercise, completionScale, completionOpacity, isFinalLastExercise]);
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
@@ -359,6 +370,19 @@ export default function ExerciseScreen() {
       <View style={{ paddingBottom: insets.bottom }}>
         <MusicMiniPlayer />
       </View>
+
+      {isFinalLastExercise && (
+        <ConfettiCannon
+          ref={confettiRef}
+          count={200}
+          origin={{ x: -10, y: 0 }}
+          autoStart={false}
+          fadeOut={true}
+          explosionSpeed={350}
+          fallSpeed={3000}
+          colors={['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD']}
+        />
+      )}
     </CosmicBackground>
   );
 }
