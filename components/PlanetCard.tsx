@@ -84,7 +84,10 @@ export function PlanetCard({
                   source={{ uri: planet.imageUrl }}
                   style={styles.planetImage}
                   resizeMode="cover"
-                  onError={() => setImageError(true)}
+                  onError={() => {
+                    console.log(`[PlanetCard] image load error for planet ${planet.id}`);
+                    setImageError(true);
+                  }}
                 />
               ) : (
                 <Text style={styles.emoji}>{planet.emoji}</Text>

@@ -138,23 +138,40 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   const purchaseItem = useCallback(
     (itemId: string, cost: number): boolean => {
-      if (totalStars < cost) return false;
-      if (purchasedItems.includes(itemId)) return false;
-      const newItems = [...purchasedItems, itemId];
+      // Use refs to get latest values synchronously
+      const currentStars = totalStarsRef.current;
+      const currentPurchased = purchasedItemsRef.current;
+
+      if (currentStars < cost) {
+        console.log(`[ProgressContext] purchaseItem failed: not enough stars (${currentStars} < ${cost})`);
+        return false;
+      }
+      if (currentPurchased.includes(itemId)) {
+        console.log(`[ProgressContext] purchaseItem failed: already purchased ${itemId}`);
+        return false;
+      }
+
+      const newItems = [...currentPurchased, itemId];
+      const newTotal = currentStars - cost;
+
       setPurchasedItems(newItems);
       savePurchasedItems(newItems);
-      const newTotal = totalStars - cost;
       setTotalStars(newTotal);
       saveTotalStars(newTotal);
+
+      // Update refs immediately
+      purchasedItemsRef.current = newItems;
+      totalStarsRef.current = newTotal;
+
       console.log(`[ProgressContext] purchased item: ${itemId}, cost=${cost}, remaining stars=${newTotal}`);
       return true;
     },
-    [totalStars, purchasedItems]
+    [] // No dependencies — uses refs for latest values
   );
 
   const isItemPurchased = useCallback(
-    (itemId: string) => purchasedItems.includes(itemId),
-    [purchasedItems]
+    (itemId: string) => purchasedItemsRef.current.includes(itemId),
+    []
   );
 
   const resetProgress = useCallback(() => {

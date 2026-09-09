@@ -16,7 +16,7 @@ import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
-import { BookOpen, ShoppingBag, Settings } from 'lucide-react-native';
+import { BookOpen, ShoppingBag } from 'lucide-react-native';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -61,11 +61,6 @@ export default function HomeScreen() {
     router.push('/shop');
   };
 
-  const handleSettingsPress = () => {
-    console.log('[HomeScreen] settings button pressed');
-    router.push('/settings');
-  };
-
   return (
     <CosmicBackground style={styles.container}>
       {/* Header */}
@@ -106,15 +101,6 @@ export default function HomeScreen() {
           >
             <View style={styles.iconButton}>
               <BookOpen size={22} color={COLORS.text} />
-            </View>
-          </AnimatedPressable>
-          <AnimatedPressable
-            onPress={handleSettingsPress}
-            accessibilityLabel="Настройки"
-            accessibilityRole="button"
-          >
-            <View style={styles.iconButton}>
-              <Settings size={22} color={COLORS.text} />
             </View>
           </AnimatedPressable>
         </View>
