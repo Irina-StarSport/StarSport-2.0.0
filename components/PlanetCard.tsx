@@ -78,12 +78,12 @@ export function PlanetCard({
 
           <View style={styles.row}>
             {/* Planet emoji */}
-            <View style={[styles.emojiContainer, { backgroundColor: planet.color + '20' }]}>
+            <View style={styles.emojiContainer}>
               {planet.imageUrl && !imageError ? (
                 <Image
                   source={{ uri: planet.imageUrl }}
                   style={styles.planetImage}
-                  resizeMode="cover"
+                  resizeMode="contain"
                   onError={() => {
                     console.log(`[PlanetCard] image load error for planet ${planet.id}`);
                     setImageError(true);
@@ -169,14 +169,16 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#0a0a1a',
+    overflow: 'hidden',
   },
   emoji: {
     fontSize: 36,
   },
   planetImage: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
   info: {
     flex: 1,

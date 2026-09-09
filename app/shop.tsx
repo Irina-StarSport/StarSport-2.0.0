@@ -34,6 +34,7 @@ export default function ShopScreen() {
   const { settings } = useSettings();
   const lang = settings.language;
   const [activeCategory, setActiveCategory] = useState<ShopItemCategory | 'all'>('all');
+  const [confirmingItemId, setConfirmingItemId] = useState<string | null>(null);
 
   const CATEGORIES: { id: ShopItemCategory | 'all'; label: string; emoji: string }[] = [
     { id: 'all', label: t(lang, 'all'), emoji: '🛍️' },
@@ -48,39 +49,6 @@ export default function ShopScreen() {
 
   const rows = chunkArray(filteredItems, 2);
 
-  const handlePurchase = (itemId: string, cost: number, name: string) => {
-    console.log(`[ShopScreen] purchase pressed: itemId=${itemId}, cost=${cost}`);
-    if (isItemPurchased(itemId)) return;
-    if (totalStars < cost) {
-      Alert.alert(
-        t(lang, 'notEnoughStars'),
-        `${cost} ⭐ — ${totalStars} ⭐`,
-        [{ text: 'OK', style: 'default' }]
-      );
-      return;
-    }
-    const remainingStars = totalStars - cost;
-    Alert.alert(
-      `${name}?`,
-      `${cost} ⭐ → ${remainingStars} ⭐`,
-      [
-        { text: lang === 'en' ? 'Cancel' : 'Отмена', style: 'cancel' },
-        {
-          text: lang === 'en' ? 'Buy!' : 'Купить!',
-          onPress: () => {
-            console.log(`[ShopScreen] confirmed purchase: itemId=${itemId}`);
-            const success = purchaseItem(itemId, cost);
-            if (success) {
-              Alert.alert('🎉', `"${name}" ${lang === 'en' ? 'added to your collection!' : 'добавлен в коллекцию!'}`, [
-                { text: lang === 'en' ? 'Yay!' : 'Ура!', style: 'default' },
-              ]);
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const handleCategoryPress = (catId: ShopItemCategory | 'all') => {
     console.log(`[ShopScreen] category pressed: ${catId}`);
     setActiveCategory(catId);
@@ -89,11 +57,44 @@ export default function ShopScreen() {
   const renderItem = (item: ShopItem) => {
     const purchased = isItemPurchased(item.id);
     const canAfford = totalStars >= item.cost;
-    const emojiCircleStyle = { backgroundColor: item.color + '20' };
+    const isConfirming = confirmingItemId === item.id;
+
+    const handleBuyPress = () => {
+      console.log(`[ShopScreen] buy pressed: itemId=${item.id}, cost=${item.cost}, canAfford=${canAfford}`);
+      if (!canAfford) {
+        Alert.alert(
+          t(lang, 'notEnoughStars'),
+          lang === 'en'
+            ? `You need ${item.cost} ⭐. You have ${totalStars} ⭐.`
+            : `Нужно ${item.cost} ⭐. У тебя ${totalStars} ⭐.`,
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+      setConfirmingItemId(item.id);
+    };
+
+    const handleConfirm = () => {
+      console.log(`[ShopScreen] confirmed purchase: itemId=${item.id}, cost=${item.cost}`);
+      const success = purchaseItem(item.id, item.cost);
+      setConfirmingItemId(null);
+      if (success) {
+        Alert.alert(
+          '🎉',
+          lang === 'en' ? `"${item.name}" added to your collection!` : `"${item.name}" добавлен в коллекцию!`,
+          [{ text: lang === 'en' ? 'Yay!' : 'Ура!' }]
+        );
+      }
+    };
+
+    const handleCancelConfirm = () => {
+      console.log(`[ShopScreen] purchase cancelled: itemId=${item.id}`);
+      setConfirmingItemId(null);
+    };
+
     const buyButtonStyle = canAfford ? styles.buyButtonAffordable : styles.buyButtonLocked;
-    const buyLabel = `${t(lang, 'buy')} ⭐ ${item.cost}`;
-    const lockedLabel = `⭐ ${item.cost}`;
-    const buyButtonLabel = canAfford ? buyLabel : lockedLabel;
+    const buyLabel = canAfford ? `${t(lang, 'buy')} ⭐ ${item.cost}` : `⭐ ${item.cost}`;
+
     return (
       <View key={item.id} style={styles.itemCard}>
         {purchased && (
@@ -101,23 +102,41 @@ export default function ShopScreen() {
             <Text style={styles.purchasedBadgeText}>✓</Text>
           </View>
         )}
-        <View style={[styles.itemEmojiCircle, emojiCircleStyle]}>
+        <View style={[styles.itemEmojiCircle, { backgroundColor: item.color + '20' }]}>
           <Text style={styles.itemEmoji}>{item.emoji}</Text>
         </View>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.itemDescription} numberOfLines={2}>{item.description}</Text>
+
         {purchased ? (
           <View style={styles.ownedBadge}>
             <Text style={styles.ownedText}>{t(lang, 'inCollection')}</Text>
           </View>
+        ) : isConfirming ? (
+          <View style={styles.confirmRow}>
+            <TouchableOpacity
+              style={styles.confirmBtn}
+              onPress={handleConfirm}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.confirmBtnText}>✓</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={handleCancelConfirm}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.cancelBtnText}>✗</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <TouchableOpacity
             style={[styles.buyButton, buyButtonStyle]}
-            onPress={() => handlePurchase(item.id, item.cost, item.name)}
+            onPress={handleBuyPress}
             activeOpacity={0.75}
           >
             <Text style={[styles.buyButtonText, !canAfford && styles.buyButtonTextLocked]}>
-              {buyButtonLabel}
+              {buyLabel}
             </Text>
           </TouchableOpacity>
         )}
@@ -294,6 +313,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+    alignItems: 'stretch',
   },
   itemCard: {
     flex: 1,
@@ -305,6 +325,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     position: 'relative',
+    justifyContent: 'space-between',
   },
   itemPlaceholder: {
     flex: 1,
@@ -369,6 +390,40 @@ const styles = StyleSheet.create({
     color: '#FFD700',
   },
   buyButtonTextLocked: {
+    color: COLORS.textSecondary,
+  },
+  confirmRow: {
+    flexDirection: 'row',
+    gap: 6,
+    width: '100%',
+    marginTop: 2,
+  },
+  confirmBtn: {
+    flex: 1,
+    paddingVertical: 7,
+    borderRadius: 10,
+    backgroundColor: 'rgba(76,175,80,0.25)',
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    alignItems: 'center',
+  },
+  confirmBtnText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+    color: '#4CAF50',
+  },
+  cancelBtn: {
+    flex: 1,
+    paddingVertical: 7,
+    borderRadius: 10,
+    backgroundColor: COLORS.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+  },
+  cancelBtnText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
     color: COLORS.textSecondary,
   },
   ownedBadge: {

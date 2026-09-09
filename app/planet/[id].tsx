@@ -104,7 +104,6 @@ export default function PlanetScreen() {
                   styles.planetGlow,
                   {
                     boxShadow: `0 0 40px ${planet.glowColor}`,
-                    backgroundColor: planet.color + '20',
                   },
                 ]}
               >
@@ -112,7 +111,7 @@ export default function PlanetScreen() {
                   <Image
                     source={{ uri: planet.imageUrl }}
                     style={{ width: 100, height: 100, borderRadius: 50 }}
-                    resizeMode="cover"
+                    resizeMode="contain"
                     onError={() => {
                       console.log(`[PlanetScreen] image load error for planet ${planet.id}`);
                       setImageError(true);
@@ -210,6 +209,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
+    backgroundColor: '#0a0a1a',
+    overflow: 'hidden',
   },
   planetEmoji: {
     fontSize: 56,
