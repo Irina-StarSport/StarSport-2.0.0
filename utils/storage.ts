@@ -85,3 +85,30 @@ export async function savePurchasedItems(items: string[]): Promise<void> {
     await AsyncStorage.setItem(SHOP_KEY, JSON.stringify(items));
   } catch {}
 }
+
+const SETTINGS_KEY = 'starsport_settings';
+
+export interface AppSettings {
+  textSize: 'small' | 'normal' | 'large';
+  language: 'ru' | 'en';
+}
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  textSize: 'normal',
+  language: 'ru',
+};
+
+export async function loadSettings(): Promise<AppSettings> {
+  try {
+    const val = await AsyncStorage.getItem(SETTINGS_KEY);
+    return val ? { ...DEFAULT_SETTINGS, ...JSON.parse(val) } : DEFAULT_SETTINGS;
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+export async function saveSettings(settings: AppSettings): Promise<void> {
+  try {
+    await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch {}
+}

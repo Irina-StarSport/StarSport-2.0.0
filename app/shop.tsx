@@ -5,15 +5,17 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { StarCounter } from '@/components/StarCounter';
 import { COLORS } from '@/constants/SpaceColors';
-import { SHOP_ITEMS, ShopItemCategory } from '@/constants/shopItems';
+import { SHOP_ITEMS, ShopItemCategory, ShopItem } from '@/constants/shopItems';
 import { useProgress } from '@/contexts/ProgressContext';
+import { ChevronLeft } from 'lucide-react-native';
 
 const CATEGORIES: { id: ShopItemCategory | 'all'; label: string; emoji: string }[] = [
   { id: 'all', label: 'Все', emoji: '🛍️' },
@@ -22,14 +24,25 @@ const CATEGORIES: { id: ShopItemCategory | 'all'; label: string; emoji: string }
   { id: 'background', label: 'Фоны', emoji: '🌌' },
 ];
 
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}
+
 export default function ShopScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { totalStars, purchaseItem, isItemPurchased } = useProgress();
   const [activeCategory, setActiveCategory] = useState<ShopItemCategory | 'all'>('all');
 
   const filteredItems = activeCategory === 'all'
     ? SHOP_ITEMS
     : SHOP_ITEMS.filter((item) => item.category === activeCategory);
+
+  const rows = chunkArray(filteredItems, 2);
 
   const handlePurchase = (itemId: string, cost: number, name: string) => {
     console.log(`[ShopScreen] purchase pressed: itemId=${itemId}, cost=${cost}`);
@@ -69,28 +82,74 @@ export default function ShopScreen() {
     setActiveCategory(catId);
   };
 
+  const renderItem = (item: ShopItem) => {
+    const purchased = isItemPurchased(item.id);
+    const canAfford = totalStars >= item.cost;
+    const emojiCircleStyle = { backgroundColor: item.color + '20' };
+    const buyButtonStyle = canAfford ? styles.buyButtonAffordable : styles.buyButtonLocked;
+    const buyButtonLabel = canAfford ? `Купить ⭐ ${item.cost}` : `⭐ ${item.cost}`;
+    return (
+      <View key={item.id} style={styles.itemCard}>
+        {purchased && (
+          <View style={styles.purchasedBadge}>
+            <Text style={styles.purchasedBadgeText}>✓</Text>
+          </View>
+        )}
+        <View style={[styles.itemEmojiCircle, emojiCircleStyle]}>
+          <Text style={styles.itemEmoji}>{item.emoji}</Text>
+        </View>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemDescription} numberOfLines={2}>{item.description}</Text>
+        {purchased ? (
+          <View style={styles.ownedBadge}>
+            <Text style={styles.ownedText}>✓ В коллекции</Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={[styles.buyButton, buyButtonStyle]}
+            onPress={() => handlePurchase(item.id, item.cost, item.name)}
+            activeOpacity={0.75}
+          >
+            <Text style={[styles.buyButtonText, !canAfford && styles.buyButtonTextLocked]}>
+              {buyButtonLabel}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
   return (
     <CosmicBackground style={styles.container}>
-      <Stack.Screen
-        options={{
-          title: 'Магазин наград',
-          headerTransparent: true,
-          headerTintColor: COLORS.text,
-          headerTitleStyle: {
-            fontFamily: 'Nunito_700Bold',
-            color: COLORS.text,
-          },
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
+
+      {/* Custom header */}
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            console.log('[ShopScreen] back pressed');
+            router.back();
+          }}
+          activeOpacity={0.7}
+        >
+          <ChevronLeft size={24} color={COLORS.text} />
+          <Text style={styles.backText}>Назад</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Магазин наград</Text>
+        <View style={styles.headerRight}>
+          <StarCounter count={totalStars} size="small" />
+        </View>
+      </View>
 
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 24 },
+          { paddingBottom: insets.bottom + 24 },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Balance */}
+        {/* Balance card */}
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Твои звёзды</Text>
           <StarCounter count={totalStars} size="large" />
@@ -112,66 +171,25 @@ export default function ShopScreen() {
                 accessibilityLabel={cat.label}
                 accessibilityRole="button"
               >
-                <View style={[
-                  styles.categoryChip,
-                  isActive && styles.categoryChipActive,
-                ]}>
+                <View style={[styles.categoryChip, isActive && styles.categoryChipActive]}>
                   <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                  <Text style={[
-                    styles.categoryLabel,
-                    isActive && styles.categoryLabelActive,
-                  ]}>{cat.label}</Text>
+                  <Text style={[styles.categoryLabel, isActive && styles.categoryLabelActive]}>
+                    {cat.label}
+                  </Text>
                 </View>
               </AnimatedPressable>
             );
           })}
         </ScrollView>
 
-        {/* Items grid */}
+        {/* Items in rows of 2 */}
         <View style={styles.grid}>
-          {filteredItems.map((item) => {
-            const purchased = isItemPurchased(item.id);
-            const canAfford = totalStars >= item.cost;
-            const emojiCircleStyle = { backgroundColor: item.color + '20' };
-            return (
-              <AnimatedPressable
-                key={item.id}
-                onPress={() => handlePurchase(item.id, item.cost, item.name)}
-                style={styles.itemWrapper}
-                accessibilityLabel={`${item.name}, ${item.cost} звёзд`}
-                accessibilityRole="button"
-              >
-                <View style={[
-                  styles.itemCard,
-                  purchased && styles.itemCardPurchased,
-                  !canAfford && !purchased && styles.itemCardLocked,
-                ]}>
-                  {purchased && (
-                    <View style={styles.purchasedBadge}>
-                      <Text style={styles.purchasedBadgeText}>✓</Text>
-                    </View>
-                  )}
-                  <View style={[styles.itemEmojiCircle, emojiCircleStyle]}>
-                    <Text style={styles.itemEmoji}>{item.emoji}</Text>
-                  </View>
-                  <Text style={styles.itemName}>{item.name}</Text>
-                  <Text style={styles.itemDescription} numberOfLines={2}>{item.description}</Text>
-                  {purchased ? (
-                    <View style={styles.ownedBadge}>
-                      <Text style={styles.ownedText}>В коллекции</Text>
-                    </View>
-                  ) : (
-                    <View style={[
-                      styles.costBadge,
-                      canAfford ? styles.costBadgeAffordable : styles.costBadgeLocked,
-                    ]}>
-                      <Text style={styles.costText}>⭐ {item.cost}</Text>
-                    </View>
-                  )}
-                </View>
-              </AnimatedPressable>
-            );
-          })}
+          {rows.map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.row}>
+              {row.map((item) => renderItem(item))}
+              {row.length === 1 && <View style={styles.itemPlaceholder} />}
+            </View>
+          ))}
         </View>
       </ScrollView>
     </CosmicBackground>
@@ -180,6 +198,36 @@ export default function ShopScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 6,
+    paddingRight: 8,
+  },
+  backText: {
+    fontSize: 16,
+    fontFamily: 'Nunito_600SemiBold',
+    color: COLORS.text,
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontFamily: 'Nunito_800ExtraBold',
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  headerRight: {
+    minWidth: 60,
+    alignItems: 'flex-end',
+  },
   scrollContent: {
     paddingHorizontal: 16,
     gap: 20,
@@ -208,7 +256,6 @@ const styles = StyleSheet.create({
   },
   categoriesRow: {
     gap: 8,
-    paddingHorizontal: 0,
   },
   categoryChip: {
     flexDirection: 'row',
@@ -231,18 +278,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_600SemiBold',
     color: COLORS.textSecondary,
   },
-  categoryLabelActive: {
-    color: '#FFD700',
-  },
+  categoryLabelActive: { color: '#FFD700' },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 12,
   },
-  itemWrapper: {
-    width: '47%',
+  row: {
+    flexDirection: 'row',
+    gap: 12,
   },
   itemCard: {
+    flex: 1,
     backgroundColor: COLORS.surface,
     borderRadius: 16,
     borderWidth: 1,
@@ -252,12 +297,8 @@ const styles = StyleSheet.create({
     gap: 8,
     position: 'relative',
   },
-  itemCardPurchased: {
-    borderColor: '#4CAF50',
-    backgroundColor: 'rgba(76,175,80,0.08)',
-  },
-  itemCardLocked: {
-    opacity: 0.6,
+  itemPlaceholder: {
+    flex: 1,
   },
   purchasedBadge: {
     position: 'absolute',
@@ -296,27 +337,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 15,
   },
-  costBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+  buyButton: {
+    width: '100%',
+    paddingVertical: 8,
     borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 4,
   },
-  costBadgeAffordable: {
-    backgroundColor: 'rgba(255,215,0,0.2)',
+  buyButtonAffordable: {
+    backgroundColor: 'rgba(255,215,0,0.25)',
+    borderWidth: 1,
+    borderColor: '#FFD700',
   },
-  costBadgeLocked: {
+  buyButtonLocked: {
     backgroundColor: COLORS.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  costText: {
+  buyButtonText: {
     fontSize: 13,
     fontFamily: 'Nunito_700Bold',
     color: '#FFD700',
   },
+  buyButtonTextLocked: {
+    color: COLORS.textSecondary,
+  },
   ownedBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+    width: '100%',
+    paddingVertical: 8,
     borderRadius: 12,
     backgroundColor: 'rgba(76,175,80,0.2)',
+    alignItems: 'center',
+    marginTop: 4,
   },
   ownedText: {
     fontSize: 12,

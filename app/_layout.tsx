@@ -16,6 +16,7 @@ import { StatusBar } from "expo-status-bar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProgressProvider } from "@/contexts/ProgressContext";
 import { MusicProvider } from "@/contexts/MusicContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 import {
   useFonts,
   Nunito_400Regular,
@@ -71,6 +72,7 @@ export default function RootLayout() {
       <StatusBar style="light" animated />
       <ThemeProvider value={SpaceTheme}>
         <SafeAreaProvider>
+          <SettingsProvider>
           <ProgressProvider>
             <MusicProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
@@ -133,11 +135,13 @@ export default function RootLayout() {
                     }}
                   />
                   <Stack.Screen name="shop" options={{ presentation: 'modal', headerShown: false }} />
+                  <Stack.Screen name="settings" options={{ presentation: 'modal', headerShown: false }} />
                 </Stack>
                 <SystemBars style="light" />
               </GestureHandlerRootView>
             </MusicProvider>
           </ProgressProvider>
+          </SettingsProvider>
         </SafeAreaProvider>
       </ThemeProvider>
     </DevErrorBoundary>

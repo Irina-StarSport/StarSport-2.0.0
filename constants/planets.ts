@@ -281,7 +281,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,87,34,0.4)',
     starsReward: 2,
     unlockAfter: 'moon',
-    imageUrl: 'https://images-assets.nasa.gov/image/PIA00407/PIA00407~orig.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/240px-OSIRIS_Mars_true_color.jpg',
     exercises: [
       {
         id: 'mars-1',
@@ -444,7 +444,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,152,0,0.4)',
     starsReward: 3,
     unlockAfter: 'mars',
-    imageUrl: 'https://images-assets.nasa.gov/image/PIA00343/PIA00343~orig.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/240px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg',
     exercises: [
       {
         id: 'jupiter-1',
@@ -607,7 +607,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(33,150,243,0.4)',
     starsReward: 3,
     unlockAfter: 'jupiter',
-    imageUrl: 'https://images-assets.nasa.gov/image/PIA01492/PIA01492~orig.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Neptune_Voyager2_centred.jpg/240px-Neptune_Voyager2_centred.jpg',
     exercises: [
       {
         id: 'neptune-1',

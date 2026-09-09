@@ -111,7 +111,7 @@ export default function PlanetScreen() {
                 {planet.imageUrl && !imageError ? (
                   <Image
                     source={{ uri: planet.imageUrl }}
-                    style={{ width: 80, height: 80, borderRadius: 40 }}
+                    style={{ width: 100, height: 100, borderRadius: 50 }}
                     resizeMode="cover"
                     onError={() => setImageError(true)}
                   />

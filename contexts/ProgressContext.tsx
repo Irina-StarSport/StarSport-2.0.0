@@ -23,6 +23,7 @@ interface ProgressContextType {
   purchasedItems: string[];
   purchaseItem: (itemId: string, cost: number) => boolean;
   isItemPurchased: (itemId: string) => boolean;
+  resetProgress: () => void;
 }
 
 const ProgressContext = createContext<ProgressContextType | null>(null);
@@ -156,6 +157,16 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     [purchasedItems]
   );
 
+  const resetProgress = useCallback(() => {
+    setTotalStars(0);
+    setPlanetProgress({});
+    setPurchasedItems([]);
+    saveTotalStars(0);
+    savePlanetProgress({});
+    savePurchasedItems([]);
+    console.log('[ProgressContext] progress reset');
+  }, []);
+
   return (
     <ProgressContext.Provider
       value={{
@@ -170,6 +181,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         purchasedItems,
         purchaseItem,
         isItemPurchased,
+        resetProgress,
       }}
     >
       {children}

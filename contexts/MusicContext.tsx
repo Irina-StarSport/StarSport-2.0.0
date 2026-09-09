@@ -38,6 +38,8 @@ interface MusicContextType {
   previous: () => void;
   addCustomTrack: (uri: string, name: string) => void;
   removeCustomTrack: (id: string) => void;
+  volume: number;
+  setVolume: (v: number) => void;
 }
 
 const MusicContext = createContext<MusicContextType | null>(null);
@@ -46,7 +48,13 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [customTracks, setCustomTracks] = useState<Track[]>([]);
+  const [volume, setVolumeState] = useState(0.8);
   const playerRef = useRef<AudioPlayer | null>(null);
+
+  const setVolume = useCallback((v: number) => {
+    console.log(`[MusicContext] setVolume: ${v}`);
+    setVolumeState(v);
+  }, []);
 
   const allTracks = useMemo(() => [...PRESET_TRACKS, ...customTracks], [customTracks]);
 
@@ -161,6 +169,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         previous,
         addCustomTrack,
         removeCustomTrack,
+        volume,
+        setVolume,
       }}
     >
       {children}
