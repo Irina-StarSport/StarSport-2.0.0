@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Animated,
   Platform,
+  Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -162,7 +163,6 @@ export default function ExerciseScreen() {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
   const timeDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  const durationText = exercise.reps ? exercise.reps : `${exercise.duration} сек`;
   const completeButtonLabel = `Упражнение выполнено! ⭐×${planet.starsReward}`;
 
   return (
@@ -263,16 +263,20 @@ export default function ExerciseScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Описание</Text>
           <Text style={styles.description}>{exercise.description}</Text>
+          {/* Illustration */}
+          <View style={styles.illustrationContainer}>
+            <Image
+              source={{ uri: exercise.illustrationUrl }}
+              style={styles.illustrationImage}
+              resizeMode="contain"
+            />
+          </View>
           {exercise.reps && (
             <View style={styles.repsRow}>
               <Text style={styles.repsLabel}>Повторений:</Text>
               <Text style={[styles.repsValue, { color: planet.color }]}>{exercise.reps}</Text>
             </View>
           )}
-          <View style={styles.repsRow}>
-            <Text style={styles.repsLabel}>Время:</Text>
-            <Text style={[styles.repsValue, { color: planet.color }]}>{durationText}</Text>
-          </View>
         </View>
 
         {/* Parent tip card */}
@@ -601,5 +605,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Nunito_800ExtraBold',
     color: '#000',
+  },
+  illustrationContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+  },
+  illustrationImage: {
+    width: 160,
+    height: 160,
   },
 });

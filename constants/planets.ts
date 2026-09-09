@@ -7,6 +7,7 @@ export interface Exercise {
   parentTip: string;
   emoji: string;
   adaptations: string[];
+  illustrationUrl: string;
 }
 
 export interface Planet {
@@ -46,6 +47,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: приседать у стены с поддержкой',
           'Для нарушений зрения: держитесь за стул',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548530.png',
       },
       {
         id: 'earth-2',
@@ -60,6 +62,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: статическое удержание позиции',
           'Для нарушений зрения: направляйте руки к стене',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548536.png',
       },
       {
         id: 'earth-3',
@@ -74,6 +77,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивное поднятие таза с помощью родителя',
           'Для нарушений зрения: описывайте движение словами',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548524.png',
       },
       {
         id: 'earth-4',
@@ -88,6 +92,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: поднимать только одну руку',
           'Для нарушений зрения: описывайте образ супергероя',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048127.png',
       },
       {
         id: 'earth-5',
@@ -102,6 +107,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: только подъём таза без ходьбы',
           'Для нарушений зрения: держитесь за руки',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548519.png',
       },
       {
         id: 'earth-6',
@@ -116,6 +122,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивные движения с помощью родителя',
           'Для нарушений зрения: считайте обороты вслух',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548516.png',
       },
       {
         id: 'earth-7',
@@ -130,11 +137,12 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: держаться за опору двумя руками',
           'Для нарушений зрения: держитесь за стену',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548522.png',
       },
       {
         id: 'earth-8',
-        name: 'Кошка-корова',
-        description: 'На четвереньках: выгибаем спину вверх (кошка) и прогибаем вниз (корова) — разминаем позвоночник',
+        name: 'Кошка-собака',
+        description: 'На четвереньках: выгибаем спину вверх (кошка) и прогибаем вниз (собака) — разминаем позвоночник',
         duration: 45,
         reps: '8-10 раз',
         parentTip: 'Следите за правильным положением — руки под плечами, колени под бёдрами. Движения медленные и плавные. Если стоять на четвереньках сложно — выполнять сидя, наклоняя корпус.',
@@ -144,6 +152,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивные движения с поддержкой',
           'Для нарушений зрения: описывайте движение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548528.png',
       },
       {
         id: 'earth-9',
@@ -158,6 +167,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: подъём на носки держась за опору',
           'Для нарушений суставов: заменить на ходьбу на месте',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548514.png',
       },
       {
         id: 'earth-10',
@@ -172,6 +182,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: планка на коленях',
           'Для нарушений зрения: описывайте правильное положение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548532.png',
       },
     ],
   },
@@ -198,6 +209,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений зрения: держитесь за руки',
           'Для нарушений слуха: показывайте движение визуально',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548520.png',
       },
       {
         id: 'moon-2',
@@ -212,6 +224,7 @@ export const PLANETS: Planet[] = [
           'Для колясочников: выполнять только руками',
           'Для нарушений слуха: считайте вслух и показывайте пальцами',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548522.png',
       },
       {
         id: 'moon-3',
@@ -226,6 +239,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: держаться за опору',
           'Для нарушений зрения: держитесь за руки',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548514.png',
       },
       {
         id: 'moon-4',
@@ -239,6 +253,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: показывайте счёт на пальцах',
           'Для тревожных детей: используйте образ "надуваем шарик"',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548526.png',
       },
       {
         id: 'moon-5',
@@ -253,6 +268,7 @@ export const PLANETS: Planet[] = [
           'Для всех: движения очень медленные',
           'Пропустить при болях в шее',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548518.png',
       },
     ],
   },
@@ -280,6 +296,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: следить за движениями визуально',
           'Для нарушений зрения: хлопать по рукам родителя',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548534.png',
       },
       {
         id: 'mars-2',
@@ -294,6 +311,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: медленная ходьба с поддержкой',
           'Для нарушений зрения: ведите за руку',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548514.png',
       },
       {
         id: 'mars-3',
@@ -308,6 +326,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений рук: ловить двумя руками вместе',
           'Для колясочников: бросать и ловить сидя',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548536.png',
       },
       {
         id: 'mars-4',
@@ -322,6 +341,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: чувствовать вибрацию музыки',
           'Для всех: главное — веселье!',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048122.png',
       },
       {
         id: 'mars-5',
@@ -336,6 +356,7 @@ export const PLANETS: Planet[] = [
           'Для колясочников: касаться коленей руками сидя',
           'Для нарушений координации: начать с медленного темпа',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548530.png',
       },
       {
         id: 'mars-6',
@@ -350,6 +371,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: только хлопки без прыжков',
           'Для нарушений суставов: подъём на носки вместо прыжков',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548514.png',
       },
       {
         id: 'mars-7',
@@ -364,6 +386,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: держаться за опору',
           'Для нарушений зрения: держитесь за руки родителя',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548522.png',
       },
       {
         id: 'mars-8',
@@ -378,6 +401,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений рук: использовать крупные предметы',
           'Для нарушений слуха: показывайте жестами',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048127.png',
       },
       {
         id: 'mars-9',
@@ -392,6 +416,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: быстрая ходьба на месте с поддержкой',
           'Для нарушений зрения: держитесь за руки',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548516.png',
       },
       {
         id: 'mars-10',
@@ -406,6 +431,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: упрощённые движения',
           'Для нарушений зрения: только голосовые команды',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548534.png',
       },
     ],
   },
@@ -433,6 +459,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивное растяжение с помощью родителя',
           'Для нарушений зрения: описывайте движение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548524.png',
       },
       {
         id: 'jupiter-2',
@@ -447,6 +474,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивное растяжение',
           'Для нарушений зрения: описывайте образ бабочки',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548520.png',
       },
       {
         id: 'jupiter-3',
@@ -461,6 +489,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: небольшой подъём с поддержкой',
           'Для проблем со спиной: только с разрешения врача',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548528.png',
       },
       {
         id: 'jupiter-4',
@@ -475,6 +504,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: поддерживайте ребёнка в наклоне',
           'Для нарушений зрения: описывайте ощущения',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548526.png',
       },
       {
         id: 'jupiter-5',
@@ -489,6 +519,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: небольшие наклоны с поддержкой',
           'Для нарушений зрения: держитесь за стул',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548522.png',
       },
       {
         id: 'jupiter-6',
@@ -503,6 +534,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивные повороты с помощью родителя',
           'Для нарушений зрения: описывайте направление',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548530.png',
       },
       {
         id: 'jupiter-7',
@@ -517,6 +549,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивная растяжка с помощью родителя',
           'Для нарушений зрения: описывайте ощущения',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548524.png',
       },
       {
         id: 'jupiter-8',
@@ -531,6 +564,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивный подъём таза',
           'Для нарушений зрения: описывайте движение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548519.png',
       },
       {
         id: 'jupiter-9',
@@ -545,6 +579,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: держаться за опору',
           'Для нарушений зрения: описывайте образ звезды',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548522.png',
       },
       {
         id: 'jupiter-10',
@@ -559,6 +594,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: только рука или только нога',
           'Для нарушений зрения: описывайте движение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548528.png',
       },
     ],
   },
@@ -585,6 +621,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: показывайте счёт на пальцах',
           'Для тревожных детей: начните с более коротких задержек',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548526.png',
       },
       {
         id: 'neptune-2',
@@ -598,6 +635,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений зрения: сосредоточьтесь на ощущениях',
           'Для детей с астмой: проконсультируйтесь с врачом',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548526.png',
       },
       {
         id: 'neptune-3',
@@ -611,6 +649,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений речи: использовать настоящую соломинку',
           'Для нарушений слуха: показывайте движение губ',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548518.png',
       },
       {
         id: 'neptune-4',
@@ -624,6 +663,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: рисовать квадрат пальцем',
           'Для нарушений зрения: описывайте каждую сторону квадрата',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548526.png',
       },
       {
         id: 'neptune-5',
@@ -638,6 +678,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений речи: особенно полезно',
           'Для нарушений слуха: показывайте движение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048122.png',
       },
       {
         id: 'neptune-6',
@@ -651,6 +692,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений рук: держите стакан сами',
           'Для нарушений зрения: описывайте пузырьки',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548518.png',
       },
       {
         id: 'neptune-7',
@@ -664,6 +706,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивные движения рук с помощью родителя',
           'Для нарушений зрения: описывайте движение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548520.png',
       },
       {
         id: 'neptune-8',
@@ -677,6 +720,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: смеяться и чувствовать вибрацию',
           'Для нарушений речи: любые звуки смеха приветствуются',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048127.png',
       },
       {
         id: 'neptune-9',
@@ -690,6 +734,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: показывайте жестами',
           'Для нарушений зрения: сосредоточьтесь на ощущениях',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548526.png',
       },
       {
         id: 'neptune-10',
@@ -703,6 +748,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений зрения: особенно подходит',
           'Для нарушений слуха: чувствовать вибрацию голоса родителя',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548520.png',
       },
     ],
   },
@@ -728,6 +774,7 @@ export const PLANETS: Planet[] = [
           'Для всех: главное — расслабление',
           'Для нарушений зрения: описывайте образ звезды',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548522.png',
       },
       {
         id: 'final-2',
@@ -741,6 +788,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений речи: показывать жестами',
           'Для нарушений слуха: показывать на части тела',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048127.png',
       },
       {
         id: 'final-3',
@@ -755,6 +803,7 @@ export const PLANETS: Planet[] = [
           'Для ДЦП: пассивная растяжка',
           'Для нарушений зрения: описывайте ощущения',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548524.png',
       },
       {
         id: 'final-4',
@@ -768,6 +817,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений тактильного восприятия: мягкое прикосновение',
           'Для всех: главное — тепло и принятие',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048122.png',
       },
       {
         id: 'final-5',
@@ -781,6 +831,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: поднять руки и улыбнуться',
           'Для колясочников: поднять руки вверх',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548534.png',
       },
       {
         id: 'final-6',
@@ -794,6 +845,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений тактильного восприятия: мягкое поглаживание',
           'Для всех: приятное завершение',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548536.png',
       },
       {
         id: 'final-7',
@@ -807,6 +859,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений речи: показывать на пальцах',
           'Для нарушений слуха: показывать карточки с упражнениями',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548530.png',
       },
       {
         id: 'final-8',
@@ -820,6 +873,7 @@ export const PLANETS: Planet[] = [
           'Для всех: полное расслабление',
           'Для нарушений зрения: описывайте ощущения покоя',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548520.png',
       },
       {
         id: 'final-9',
@@ -833,6 +887,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений зрения: особенно подходит',
           'Для нарушений речи: нарисовать желание',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/2548/2548522.png',
       },
       {
         id: 'final-10',
@@ -846,6 +901,7 @@ export const PLANETS: Planet[] = [
           'Для нарушений слуха: чувствовать ритм через вибрацию',
           'Для всех: главное — радость!',
         ],
+        illustrationUrl: 'https://cdn-icons-png.flaticon.com/512/3048/3048122.png',
       },
     ],
   },
