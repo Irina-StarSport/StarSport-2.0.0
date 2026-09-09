@@ -16,12 +16,16 @@ import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
+import { useSettings } from '@/contexts/SettingsContext';
+import { t } from '@/constants/translations';
 import { BookOpen, ShoppingBag } from 'lucide-react-native';
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { totalStars, planetProgress, isPlanetUnlocked, getPlanetStars } = useProgress();
+  const { settings } = useSettings();
+  const lang = settings.language;
 
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(-12)).current;
@@ -73,7 +77,7 @@ export default function HomeScreen() {
       >
         <View style={styles.headerLeft}>
           <Text style={styles.appTitle}>StarSport</Text>
-          <Text style={styles.appSubtitle}>Планета Здоровья</Text>
+          <Text style={styles.appSubtitle}>{t(lang, 'appSubtitle')}</Text>
         </View>
         <View style={styles.headerRight}>
           <AnimatedPressable
@@ -112,9 +116,9 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 16 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Выбери планету</Text>
+        <Text style={styles.sectionTitle}>{t(lang, 'choosePlanet')}</Text>
         <Text style={styles.sectionSubtitle}>
-          Путешествуй по Солнечной системе и выполняй упражнения
+          {t(lang, 'choosePlanetSubtitle')}
         </Text>
 
         {PLANETS.map((planet, index) => {

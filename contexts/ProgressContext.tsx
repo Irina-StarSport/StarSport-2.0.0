@@ -170,8 +170,8 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   );
 
   const isItemPurchased = useCallback(
-    (itemId: string) => purchasedItemsRef.current.includes(itemId),
-    []
+    (itemId: string) => purchasedItems.includes(itemId),
+    [purchasedItems]
   );
 
   const resetProgress = useCallback(() => {

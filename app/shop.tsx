@@ -15,14 +15,9 @@ import { StarCounter } from '@/components/StarCounter';
 import { COLORS } from '@/constants/SpaceColors';
 import { SHOP_ITEMS, ShopItemCategory, ShopItem } from '@/constants/shopItems';
 import { useProgress } from '@/contexts/ProgressContext';
+import { useSettings } from '@/contexts/SettingsContext';
+import { t } from '@/constants/translations';
 import { ChevronLeft } from 'lucide-react-native';
-
-const CATEGORIES: { id: ShopItemCategory | 'all'; label: string; emoji: string }[] = [
-  { id: 'all', label: 'Все', emoji: '🛍️' },
-  { id: 'sticker', label: 'Стикеры', emoji: '🎨' },
-  { id: 'frame', label: 'Рамки', emoji: '🖼️' },
-  { id: 'background', label: 'Фоны', emoji: '🌌' },
-];
 
 function chunkArray<T>(arr: T[], size: number): T[][] {
   const result: T[][] = [];
@@ -35,8 +30,17 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 export default function ShopScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { totalStars, purchaseItem, isItemPurchased } = useProgress();
+  const { totalStars, purchaseItem, isItemPurchased, purchasedItems } = useProgress();
+  const { settings } = useSettings();
+  const lang = settings.language;
   const [activeCategory, setActiveCategory] = useState<ShopItemCategory | 'all'>('all');
+
+  const CATEGORIES: { id: ShopItemCategory | 'all'; label: string; emoji: string }[] = [
+    { id: 'all', label: t(lang, 'all'), emoji: '🛍️' },
+    { id: 'sticker', label: t(lang, 'stickers'), emoji: '🎨' },
+    { id: 'frame', label: t(lang, 'frames'), emoji: '🖼️' },
+    { id: 'background', label: t(lang, 'backgrounds'), emoji: '🌌' },
+  ];
 
   const filteredItems = activeCategory === 'all'
     ? SHOP_ITEMS
@@ -49,26 +53,26 @@ export default function ShopScreen() {
     if (isItemPurchased(itemId)) return;
     if (totalStars < cost) {
       Alert.alert(
-        'Недостаточно звёзд ⭐',
-        `Для покупки "${name}" нужно ${cost} звёзд.\nУ тебя сейчас ${totalStars} звёзд.\nВыполняй упражнения, чтобы заработать больше!`,
-        [{ text: 'Понятно', style: 'default' }]
+        t(lang, 'notEnoughStars'),
+        `${cost} ⭐ — ${totalStars} ⭐`,
+        [{ text: 'OK', style: 'default' }]
       );
       return;
     }
     const remainingStars = totalStars - cost;
     Alert.alert(
-      `Купить "${name}"?`,
-      `Стоимость: ${cost} ⭐\nОстаток после покупки: ${remainingStars} ⭐`,
+      `${name}?`,
+      `${cost} ⭐ → ${remainingStars} ⭐`,
       [
-        { text: 'Отмена', style: 'cancel' },
+        { text: lang === 'en' ? 'Cancel' : 'Отмена', style: 'cancel' },
         {
-          text: 'Купить!',
+          text: lang === 'en' ? 'Buy!' : 'Купить!',
           onPress: () => {
             console.log(`[ShopScreen] confirmed purchase: itemId=${itemId}`);
             const success = purchaseItem(itemId, cost);
             if (success) {
-              Alert.alert('🎉 Куплено!', `"${name}" добавлен в твою коллекцию!`, [
-                { text: 'Ура!', style: 'default' },
+              Alert.alert('🎉', `"${name}" ${lang === 'en' ? 'added to your collection!' : 'добавлен в коллекцию!'}`, [
+                { text: lang === 'en' ? 'Yay!' : 'Ура!', style: 'default' },
               ]);
             }
           },
@@ -87,7 +91,9 @@ export default function ShopScreen() {
     const canAfford = totalStars >= item.cost;
     const emojiCircleStyle = { backgroundColor: item.color + '20' };
     const buyButtonStyle = canAfford ? styles.buyButtonAffordable : styles.buyButtonLocked;
-    const buyButtonLabel = canAfford ? `Купить ⭐ ${item.cost}` : `⭐ ${item.cost}`;
+    const buyLabel = `${t(lang, 'buy')} ⭐ ${item.cost}`;
+    const lockedLabel = `⭐ ${item.cost}`;
+    const buyButtonLabel = canAfford ? buyLabel : lockedLabel;
     return (
       <View key={item.id} style={styles.itemCard}>
         {purchased && (
@@ -102,7 +108,7 @@ export default function ShopScreen() {
         <Text style={styles.itemDescription} numberOfLines={2}>{item.description}</Text>
         {purchased ? (
           <View style={styles.ownedBadge}>
-            <Text style={styles.ownedText}>✓ В коллекции</Text>
+            <Text style={styles.ownedText}>{t(lang, 'inCollection')}</Text>
           </View>
         ) : (
           <TouchableOpacity
@@ -119,6 +125,9 @@ export default function ShopScreen() {
     );
   };
 
+  // Consume purchasedItems so the component re-renders when it changes
+  void purchasedItems;
+
   return (
     <CosmicBackground style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -134,9 +143,9 @@ export default function ShopScreen() {
           activeOpacity={0.7}
         >
           <ChevronLeft size={24} color={COLORS.text} />
-          <Text style={styles.backText}>Назад</Text>
+          <Text style={styles.backText}>{t(lang, 'back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Магазин наград</Text>
+        <Text style={styles.headerTitle}>{t(lang, 'shopTitle')}</Text>
         <View style={styles.headerRight}>
           <StarCounter count={totalStars} size="small" />
         </View>
@@ -151,9 +160,9 @@ export default function ShopScreen() {
       >
         {/* Balance card */}
         <View style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>Твои звёзды</Text>
+          <Text style={styles.balanceLabel}>{t(lang, 'yourStars')}</Text>
           <StarCounter count={totalStars} size="large" />
-          <Text style={styles.balanceHint}>Выполняй упражнения, чтобы зарабатывать звёзды!</Text>
+          <Text style={styles.balanceHint}>{t(lang, 'earnMoreStars')}</Text>
         </View>
 
         {/* Category filter */}
@@ -292,9 +301,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
-    padding: 14,
+    padding: 10,
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     position: 'relative',
   },
   itemPlaceholder: {
@@ -317,32 +326,32 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_700Bold',
   },
   itemEmojiCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  itemEmoji: { fontSize: 32 },
+  itemEmoji: { fontSize: 24 },
   itemName: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: 'Nunito_700Bold',
     color: COLORS.text,
     textAlign: 'center',
   },
   itemDescription: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'Nunito_400Regular',
     color: COLORS.textSecondary,
     textAlign: 'center',
-    lineHeight: 15,
+    lineHeight: 14,
   },
   buyButton: {
     width: '100%',
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
   },
   buyButtonAffordable: {
     backgroundColor: 'rgba(255,215,0,0.25)',
@@ -355,7 +364,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   buyButtonText: {
-    fontSize: 13,
+    fontSize: 11,
     fontFamily: 'Nunito_700Bold',
     color: '#FFD700',
   },
@@ -364,14 +373,14 @@ const styles = StyleSheet.create({
   },
   ownedBadge: {
     width: '100%',
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
     backgroundColor: 'rgba(76,175,80,0.2)',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
   },
   ownedText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: 'Nunito_600SemiBold',
     color: '#4CAF50',
   },

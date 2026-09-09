@@ -14,6 +14,7 @@ import { useProgress } from '@/contexts/ProgressContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { Type, Globe, RotateCcw, Volume2 } from 'lucide-react-native';
+import { t } from '@/constants/translations';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -42,10 +43,12 @@ export default function SettingsScreen() {
     );
   };
 
+  const lang = settings.language;
+
   const textSizeOptions: { value: 'small' | 'normal' | 'large'; label: string }[] = [
-    { value: 'small', label: 'Маленький' },
-    { value: 'normal', label: 'Обычный' },
-    { value: 'large', label: 'Крупный' },
+    { value: 'small', label: t(lang, 'small') },
+    { value: 'normal', label: t(lang, 'normal') },
+    { value: 'large', label: t(lang, 'large') },
   ];
 
   const languageOptions: { value: 'ru' | 'en'; label: string; flag: string }[] = [
@@ -64,7 +67,7 @@ export default function SettingsScreen() {
     <CosmicBackground style={styles.container}>
       {/* Custom header */}
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.headerTitle}>Настройки ⚙️</Text>
+        <Text style={styles.headerTitle}>{t(lang, 'settingsTitle')} ⚙️</Text>
       </View>
 
       <ScrollView
@@ -78,9 +81,9 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Type size={18} color={COLORS.accent} />
-            <Text style={styles.sectionTitle}>Размер текста</Text>
+            <Text style={styles.sectionTitle}>{t(lang, 'textSize')}</Text>
           </View>
-          <Text style={sectionHintStyle}>Увеличьте текст для детей с нарушениями зрения</Text>
+          <Text style={sectionHintStyle}>{t(lang, 'textSizeHint')}</Text>
           <View style={styles.optionsRow}>
             {textSizeOptions.map((opt) => {
               const isActive = settings.textSize === opt.value;
@@ -111,7 +114,7 @@ export default function SettingsScreen() {
           {/* Live preview */}
           <View style={styles.previewBox}>
             <Text style={[styles.previewText, { fontSize: previewFontSize }]}>
-              Пример текста — так будет выглядеть описание упражнений
+              {t(lang, 'previewText')}
             </Text>
           </View>
         </View>
@@ -120,7 +123,7 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Volume2 size={18} color={COLORS.accent} />
-            <Text style={styles.sectionTitle}>Громкость музыки</Text>
+            <Text style={styles.sectionTitle}>{t(lang, 'musicVolume')}</Text>
           </View>
           <View style={styles.optionsRow}>
             {volumeSteps.map((step, i) => {
@@ -150,9 +153,9 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Globe size={18} color={COLORS.accent} />
-            <Text style={styles.sectionTitle}>Язык</Text>
+            <Text style={styles.sectionTitle}>{t(lang, 'language')}</Text>
           </View>
-          <Text style={sectionHintStyle}>Язык интерфейса приложения</Text>
+          <Text style={sectionHintStyle}>{t(lang, 'languageHint')}</Text>
           <View style={styles.optionsRow}>
             {languageOptions.map((opt) => {
               const isActive = settings.language === opt.value;
@@ -189,10 +192,10 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <RotateCcw size={18} color={COLORS.danger} />
-            <Text style={[styles.sectionTitle, styles.dangerTitle]}>Сброс прогресса</Text>
+            <Text style={[styles.sectionTitle, styles.dangerTitle]}>{t(lang, 'resetProgress')}</Text>
           </View>
           <Text style={sectionHintStyle}>
-            Удалит все звёзды, пройденные упражнения и купленные предметы. Начнёте путешествие заново.
+            {t(lang, 'resetProgressHint')}
           </Text>
           <TouchableOpacity
             style={styles.resetButton}
@@ -200,7 +203,7 @@ export default function SettingsScreen() {
             activeOpacity={0.75}
           >
             <RotateCcw size={16} color="#fff" />
-            <Text style={styles.resetButtonText}>Сбросить прогресс</Text>
+            <Text style={styles.resetButtonText}>{t(lang, 'resetButton')}</Text>
           </TouchableOpacity>
         </View>
 
