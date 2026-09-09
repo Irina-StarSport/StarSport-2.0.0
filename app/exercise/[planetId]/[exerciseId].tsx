@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Animated,
   Platform,
-  Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -263,20 +262,18 @@ export default function ExerciseScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Описание</Text>
           <Text style={styles.description}>{exercise.description}</Text>
-          {/* Illustration */}
-          <View style={styles.illustrationContainer}>
-            <Image
-              source={{ uri: exercise.illustrationUrl }}
-              style={styles.illustrationImage}
-              resizeMode="contain"
-            />
-          </View>
           {exercise.reps && (
             <View style={styles.repsRow}>
               <Text style={styles.repsLabel}>Повторений:</Text>
               <Text style={[styles.repsValue, { color: planet.color }]}>{exercise.reps}</Text>
             </View>
           )}
+        </View>
+
+        {/* Fun fact card */}
+        <View style={[styles.card, styles.factCard]}>
+          <Text style={styles.factTitle}>Интересный факт</Text>
+          <Text style={styles.factText}>{exercise.funFact}</Text>
         </View>
 
         {/* Parent tip card */}
@@ -532,6 +529,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Nunito_700Bold',
   },
+  factCard: {
+    backgroundColor: 'rgba(255, 215, 0, 0.08)',
+    borderColor: 'rgba(255, 215, 0, 0.25)',
+  },
+  factTitle: {
+    fontSize: 12,
+    fontFamily: 'Nunito_700Bold',
+    color: '#FFD700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  factText: {
+    fontSize: 15,
+    fontFamily: 'Nunito_400Regular',
+    color: COLORS.text,
+    lineHeight: 22,
+  },
   tipHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -605,14 +619,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Nunito_800ExtraBold',
     color: '#000',
-  },
-  illustrationContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-  },
-  illustrationImage: {
-    width: 160,
-    height: 160,
   },
 });

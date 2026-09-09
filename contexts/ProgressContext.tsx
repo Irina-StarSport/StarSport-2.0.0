@@ -5,6 +5,8 @@ import {
   saveTotalStars,
   loadPlanetProgress,
   savePlanetProgress,
+  loadPurchasedItems,
+  savePurchasedItems,
   PlanetProgressMap,
 } from '@/utils/storage';
 import { PLANETS } from '@/constants/planets';
@@ -18,6 +20,9 @@ interface ProgressContextType {
   isPlanetUnlocked: (planetId: string) => boolean;
   getPlanetStars: (planetId: string) => number;
   isLoaded: boolean;
+  purchasedItems: string[];
+  purchaseItem: (itemId: string, cost: number) => boolean;
+  isItemPurchased: (itemId: string) => boolean;
 }
 
 const ProgressContext = createContext<ProgressContextType | null>(null);
@@ -26,21 +31,26 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [totalStars, setTotalStars] = useState(0);
   const [planetProgress, setPlanetProgress] = useState<PlanetProgressMap>({});
   const [isLoaded, setIsLoaded] = useState(false);
+  const [purchasedItems, setPurchasedItems] = useState<string[]>([]);
 
   // Keep refs so the AppState handler always sees the latest values
   const totalStarsRef = useRef(totalStars);
   const planetProgressRef = useRef(planetProgress);
+  const purchasedItemsRef = useRef(purchasedItems);
   useEffect(() => { totalStarsRef.current = totalStars; }, [totalStars]);
   useEffect(() => { planetProgressRef.current = planetProgress; }, [planetProgress]);
+  useEffect(() => { purchasedItemsRef.current = purchasedItems; }, [purchasedItems]);
 
   useEffect(() => {
     async function load() {
-      const [stars, progress] = await Promise.all([
+      const [stars, progress, purchased] = await Promise.all([
         loadTotalStars(),
         loadPlanetProgress(),
+        loadPurchasedItems(),
       ]);
       setTotalStars(stars);
       setPlanetProgress(progress);
+      setPurchasedItems(purchased);
       setIsLoaded(true);
     }
     load();
@@ -53,6 +63,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         console.log(`[ProgressContext] AppState changed to ${nextAppState}, flushing progress to storage`);
         saveTotalStars(totalStarsRef.current);
         savePlanetProgress(planetProgressRef.current);
+        savePurchasedItems(purchasedItemsRef.current);
       }
     };
     const subscription = AppState.addEventListener('change', handler);
@@ -124,6 +135,27 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     [planetProgress]
   );
 
+  const purchaseItem = useCallback(
+    (itemId: string, cost: number): boolean => {
+      if (totalStars < cost) return false;
+      if (purchasedItems.includes(itemId)) return false;
+      const newItems = [...purchasedItems, itemId];
+      setPurchasedItems(newItems);
+      savePurchasedItems(newItems);
+      const newTotal = totalStars - cost;
+      setTotalStars(newTotal);
+      saveTotalStars(newTotal);
+      console.log(`[ProgressContext] purchased item: ${itemId}, cost=${cost}, remaining stars=${newTotal}`);
+      return true;
+    },
+    [totalStars, purchasedItems]
+  );
+
+  const isItemPurchased = useCallback(
+    (itemId: string) => purchasedItems.includes(itemId),
+    [purchasedItems]
+  );
+
   return (
     <ProgressContext.Provider
       value={{
@@ -135,6 +167,9 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         isPlanetUnlocked,
         getPlanetStars,
         isLoaded,
+        purchasedItems,
+        purchaseItem,
+        isItemPurchased,
       }}
     >
       {children}

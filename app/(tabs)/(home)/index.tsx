@@ -16,7 +16,7 @@ import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
-import { BookOpen } from 'lucide-react-native';
+import { BookOpen, ShoppingBag } from 'lucide-react-native';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -56,6 +56,11 @@ export default function HomeScreen() {
     router.push('/guide');
   };
 
+  const handleShopPress = () => {
+    console.log('[HomeScreen] shop button pressed');
+    router.push('/shop');
+  };
+
   return (
     <CosmicBackground style={styles.container}>
       {/* Header */}
@@ -81,12 +86,22 @@ export default function HomeScreen() {
             </View>
           </AnimatedPressable>
           <AnimatedPressable
+            onPress={handleShopPress}
+            accessibilityLabel="Магазин наград"
+            accessibilityRole="button"
+          >
+            <View style={styles.iconButton}>
+              <ShoppingBag size={22} color={COLORS.text} />
+            </View>
+          </AnimatedPressable>
+          <AnimatedPressable
             onPress={handleGuidePress}
-            style={styles.guideButton}
             accessibilityLabel="Руководство пользователя"
             accessibilityRole="button"
           >
-            <BookOpen size={22} color={COLORS.textSecondary} />
+            <View style={styles.iconButton}>
+              <BookOpen size={22} color={COLORS.text} />
+            </View>
           </AnimatedPressable>
         </View>
       </Animated.View>
@@ -166,7 +181,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.primary + '30',
   },
-  guideButton: {
+  iconButton: {
     width: 44,
     height: 44,
     borderRadius: 22,

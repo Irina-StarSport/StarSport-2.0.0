@@ -68,3 +68,20 @@ export async function saveCustomTracks(tracks: CustomTrack[]): Promise<void> {
     // ignore
   }
 }
+
+const SHOP_KEY = 'starsport_purchased_items';
+
+export async function loadPurchasedItems(): Promise<string[]> {
+  try {
+    const val = await AsyncStorage.getItem(SHOP_KEY);
+    return val ? JSON.parse(val) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function savePurchasedItems(items: string[]): Promise<void> {
+  try {
+    await AsyncStorage.setItem(SHOP_KEY, JSON.stringify(items));
+  } catch {}
+}

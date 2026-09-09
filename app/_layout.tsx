@@ -132,6 +132,7 @@ export default function RootLayout() {
                       headerStyle: { backgroundColor: COLORS.background },
                     }}
                   />
+                  <Stack.Screen name="shop" options={{ presentation: 'modal', headerShown: false }} />
                 </Stack>
                 <SystemBars style="light" />
               </GestureHandlerRootView>
