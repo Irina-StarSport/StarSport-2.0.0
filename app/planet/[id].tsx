@@ -14,6 +14,8 @@ import { ExerciseCard } from '@/components/ExerciseCard';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
+import { useSettings } from '@/contexts/SettingsContext';
+import { t } from '@/constants/translations';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function PlanetScreen() {
@@ -21,6 +23,8 @@ export default function PlanetScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { planetProgress, isExerciseCompleted, getPlanetStars } = useProgress();
+  const { settings } = useSettings();
+  const lang = settings.language;
 
   const planet = PLANETS.find((p) => p.id === id);
 
@@ -113,9 +117,10 @@ export default function PlanetScreen() {
                     style={{ width: 100, height: 100, borderRadius: 50 }}
                     resizeMode="cover"
                     onError={() => {
-                      console.log(`[PlanetScreen] image load error for planet ${planet.id}`);
+                      console.log(`[PlanetScreen] image load error for planet ${planet.id}, falling back to emoji`);
                       setImageError(true);
                     }}
+                    onLoad={() => console.log(`[PlanetScreen] image loaded for planet ${planet.id}`)}
                   />
                 ) : (
                   <Text style={styles.planetEmoji}>{planet.emoji}</Text>
@@ -129,7 +134,7 @@ export default function PlanetScreen() {
               {/* Stars earned */}
               <View style={styles.starsRow}>
                 <Text style={styles.starEmoji}>⭐</Text>
-                <Text style={styles.starsText}>{starsEarned} звёзд заработано</Text>
+                <Text style={styles.starsText}>{starsEarned} {t(lang, 'starsEarned')}</Text>
               </View>
             </Animated.View>
 
@@ -137,7 +142,7 @@ export default function PlanetScreen() {
             <View style={styles.progressSection}>
               <View style={styles.progressHeader}>
                 <Text style={styles.progressLabel}>
-                  Выполнено {completedCount} из {total} упражнений
+                  {t(lang, 'exercisesCompleted')} {completedCount} {t(lang, 'of')} {total} {t(lang, 'exercises')}
                 </Text>
                 <Text style={[styles.progressPercent, { color: planet.color }]}>
                   {progressPercent}%
@@ -156,7 +161,7 @@ export default function PlanetScreen() {
               </View>
             </View>
 
-            <Text style={styles.exercisesTitle}>Упражнения</Text>
+            <Text style={styles.exercisesTitle}>{t(lang, 'exercisesTitle')}</Text>
           </View>
         }
         renderItem={({ item, index }) => (

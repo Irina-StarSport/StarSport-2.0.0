@@ -15,6 +15,7 @@ import { MusicMiniPlayer } from '@/components/MusicMiniPlayer';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
+import { SHOP_ITEMS } from '@/constants/shopItems';
 import { useProgress } from '@/contexts/ProgressContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { t } from '@/constants/translations';
@@ -23,7 +24,7 @@ import { BookOpen, ShoppingBag } from 'lucide-react-native';
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { totalStars, planetProgress, isPlanetUnlocked, getPlanetStars, activeBackground } = useProgress();
+  const { totalStars, planetProgress, isPlanetUnlocked, getPlanetStars, activeBackground, activeStickers } = useProgress();
   const { settings } = useSettings();
   const lang = settings.language;
 
@@ -81,7 +82,19 @@ export default function HomeScreen() {
         ]}
       >
         <View style={styles.headerLeft}>
-          <Text style={styles.appTitle}>StarSport</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.appTitle}>StarSport</Text>
+            {activeStickers.length > 0 && (
+              <View style={styles.titleStickers}>
+                {activeStickers.slice(0, 2).map((id) => {
+                  const item = SHOP_ITEMS.find((s) => s.id === id);
+                  return item ? (
+                    <Text key={id} style={styles.titleStickerEmoji}>{item.emoji}</Text>
+                  ) : null;
+                })}
+              </View>
+            )}
+          </View>
           <Text style={styles.appSubtitle}>{t(lang, 'appSubtitle')}</Text>
         </View>
         <View style={styles.headerRight}>
@@ -165,6 +178,18 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     gap: 2,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  titleStickers: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  titleStickerEmoji: {
+    fontSize: 22,
   },
   appTitle: {
     fontSize: 28,

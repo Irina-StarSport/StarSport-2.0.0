@@ -16,6 +16,8 @@ import { MusicMiniPlayer } from '@/components/MusicMiniPlayer';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
 import { useProgress } from '@/contexts/ProgressContext';
+import { useSettings } from '@/contexts/SettingsContext';
+import { t } from '@/constants/translations';
 import { Play, Pause, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 
@@ -30,6 +32,8 @@ export default function ExerciseScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { completeExercise, isExerciseCompleted } = useProgress();
+  const { settings } = useSettings();
+  const lang = settings.language;
 
   const planet = PLANETS.find((p) => p.id === planetId);
   const exercise = planet?.exercises.find((e) => e.id === exerciseId);
@@ -162,7 +166,7 @@ export default function ExerciseScreen() {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
   const timeDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  const completeButtonLabel = `Упражнение выполнено! ⭐×${planet.starsReward}`;
+  const completeButtonLabel = `${t(lang, 'exerciseDone')} ⭐×${planet.starsReward}`;
 
   return (
     <CosmicBackground style={styles.container}>
@@ -260,11 +264,11 @@ export default function ExerciseScreen() {
 
         {/* Description card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Описание</Text>
+          <Text style={styles.cardTitle}>{t(lang, 'description')}</Text>
           <Text style={styles.description}>{exercise.description}</Text>
           {exercise.reps && (
             <View style={styles.repsRow}>
-              <Text style={styles.repsLabel}>Повторений:</Text>
+              <Text style={styles.repsLabel}>{t(lang, 'reps')}</Text>
               <Text style={[styles.repsValue, { color: planet.color }]}>{exercise.reps}</Text>
             </View>
           )}
@@ -272,7 +276,7 @@ export default function ExerciseScreen() {
 
         {/* Fun fact card */}
         <View style={[styles.card, styles.factCard]}>
-          <Text style={styles.factTitle}>Интересный факт</Text>
+          <Text style={styles.factTitle}>{t(lang, 'funFact')}</Text>
           <Text style={styles.factText}>{exercise.funFact}</Text>
         </View>
 
@@ -283,13 +287,13 @@ export default function ExerciseScreen() {
               console.log(`[ExerciseScreen] tip toggle: expanded=${!tipExpanded}`);
               setTipExpanded((prev) => !prev);
             }}
-            accessibilityLabel="Совет для родителя"
+            accessibilityLabel={t(lang, 'parentTip')}
             accessibilityRole="button"
           >
             <View style={styles.tipHeader}>
               <View style={styles.tipHeaderLeft}>
                 <Text style={styles.tipIcon}>👨‍👩‍👧</Text>
-                <Text style={styles.tipTitle}>Совет для родителя</Text>
+                <Text style={styles.tipTitle}>{t(lang, 'parentTip')}</Text>
               </View>
               {tipExpanded ? (
                 <ChevronUp size={18} color={COLORS.textSecondary} />
@@ -303,7 +307,7 @@ export default function ExerciseScreen() {
             <View style={styles.tipContent}>
               <Text style={styles.tipText}>{exercise.parentTip}</Text>
               <View style={styles.adaptationsList}>
-                <Text style={styles.adaptationsTitle}>Адаптации:</Text>
+                <Text style={styles.adaptationsTitle}>{t(lang, 'adaptations')}</Text>
                 {exercise.adaptations.map((adaptation, i) => (
                   <View key={i} style={styles.adaptationItem}>
                     <Text style={styles.adaptationBullet}>•</Text>
@@ -346,7 +350,7 @@ export default function ExerciseScreen() {
                       accessibilityRole="button"
                     >
                       <View style={[styles.completeButtonInner, { backgroundColor: planet.color }]}>
-                        <Text style={styles.completeButtonText}>Следующее упражнение →</Text>
+                        <Text style={styles.completeButtonText}>{t(lang, 'nextExercise')}</Text>
                       </View>
                     </AnimatedPressable>
                   )}
@@ -357,7 +361,7 @@ export default function ExerciseScreen() {
                     accessibilityRole="button"
                   >
                     <View style={[styles.completeButtonInner, { backgroundColor: COLORS.surfaceSecondary }]}>
-                      <Text style={[styles.completeButtonText, { color: COLORS.text }]}>Вернуться к планете 🚀</Text>
+                      <Text style={[styles.completeButtonText, { color: COLORS.text }]}>{t(lang, 'backToPlanet')}</Text>
                     </View>
                   </AnimatedPressable>
                 </>

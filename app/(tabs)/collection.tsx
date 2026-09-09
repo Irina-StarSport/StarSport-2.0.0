@@ -77,8 +77,17 @@ export default function CollectionScreen() {
   };
 
   const handleToggleSticker = (itemId: string) => {
-    console.log(`[Collection] sticker toggled: ${itemId}`);
+    const isCurrentlyActive = activeStickers.includes(itemId);
+    if (!isCurrentlyActive && activeStickers.length >= 2) {
+      Alert.alert(
+        'Максимум 2 стикера',
+        'Сними один из активных стикеров, чтобы добавить новый',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
     toggleActiveSticker(itemId);
+    console.log(`[Collection] sticker toggled: ${itemId}`);
   };
 
   const handleTabPress = (tabId: CollectionTab) => {

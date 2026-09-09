@@ -85,9 +85,10 @@ export function PlanetCard({
                   style={styles.planetImage}
                   resizeMode="cover"
                   onError={() => {
-                    console.log(`[PlanetCard] image load error for planet ${planet.id}`);
+                    console.log(`[PlanetCard] image load error for planet ${planet.id}, falling back to emoji`);
                     setImageError(true);
                   }}
+                  onLoad={() => console.log(`[PlanetCard] image loaded for planet ${planet.id}`)}
                 />
               ) : (
                 <Text style={styles.emoji}>{planet.emoji}</Text>
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#000',
+    backgroundColor: '#0a0a2a',
     overflow: 'hidden',
   },
   emoji: {
