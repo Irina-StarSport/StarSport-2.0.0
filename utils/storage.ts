@@ -112,3 +112,26 @@ export async function saveSettings(settings: AppSettings): Promise<void> {
     await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   } catch {}
 }
+
+const ACTIVE_ITEMS_KEY = 'starsport_active_items';
+
+export interface ActiveItems {
+  background: string | null;
+  frame: string | null;
+  stickers: string[];
+}
+
+export async function loadActiveItems(): Promise<ActiveItems> {
+  try {
+    const val = await AsyncStorage.getItem(ACTIVE_ITEMS_KEY);
+    return val ? JSON.parse(val) : { background: null, frame: null, stickers: [] };
+  } catch {
+    return { background: null, frame: null, stickers: [] };
+  }
+}
+
+export async function saveActiveItems(items: ActiveItems): Promise<void> {
+  try {
+    await AsyncStorage.setItem(ACTIVE_ITEMS_KEY, JSON.stringify(items));
+  } catch {}
+}

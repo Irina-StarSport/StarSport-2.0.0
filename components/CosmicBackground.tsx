@@ -52,9 +52,10 @@ function useTwinklingStars(count: number): Star[] {
 interface CosmicBackgroundProps {
   children?: React.ReactNode;
   style?: object;
+  tintColor?: string;
 }
 
-export function CosmicBackground({ children, style }: CosmicBackgroundProps) {
+export function CosmicBackground({ children, style, tintColor }: CosmicBackgroundProps) {
   const stars = useTwinklingStars(25);
 
   return (
@@ -81,6 +82,15 @@ export function CosmicBackground({ children, style }: CosmicBackgroundProps) {
           ]}
         />
       ))}
+      {tintColor && (
+        <View
+          style={[
+            StyleSheet.absoluteFillObject,
+            { backgroundColor: tintColor, opacity: 0.3 },
+          ]}
+          pointerEvents="none"
+        />
+      )}
       {children}
     </View>
   );

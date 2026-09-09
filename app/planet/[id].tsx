@@ -111,7 +111,7 @@ export default function PlanetScreen() {
                   <Image
                     source={{ uri: planet.imageUrl }}
                     style={{ width: 100, height: 100, borderRadius: 50 }}
-                    resizeMode="contain"
+                    resizeMode="cover"
                     onError={() => {
                       console.log(`[PlanetScreen] image load error for planet ${planet.id}`);
                       setImageError(true);

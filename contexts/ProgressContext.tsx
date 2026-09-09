@@ -7,6 +7,8 @@ import {
   savePlanetProgress,
   loadPurchasedItems,
   savePurchasedItems,
+  loadActiveItems,
+  saveActiveItems,
   PlanetProgressMap,
 } from '@/utils/storage';
 import { PLANETS } from '@/constants/planets';
@@ -24,6 +26,12 @@ interface ProgressContextType {
   purchaseItem: (itemId: string, cost: number) => boolean;
   isItemPurchased: (itemId: string) => boolean;
   resetProgress: () => void;
+  activeBackground: string | null;
+  activeFrame: string | null;
+  activeStickers: string[];
+  setActiveBackground: (id: string | null) => void;
+  setActiveFrame: (id: string | null) => void;
+  toggleActiveSticker: (id: string) => void;
 }
 
 const ProgressContext = createContext<ProgressContextType | null>(null);
@@ -33,25 +41,39 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [planetProgress, setPlanetProgress] = useState<PlanetProgressMap>({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [purchasedItems, setPurchasedItems] = useState<string[]>([]);
+  const [activeBackground, setActiveBackgroundState] = useState<string | null>(null);
+  const [activeFrame, setActiveFrameState] = useState<string | null>(null);
+  const [activeStickers, setActiveStickersState] = useState<string[]>([]);
 
   // Keep refs so the AppState handler always sees the latest values
   const totalStarsRef = useRef(totalStars);
   const planetProgressRef = useRef(planetProgress);
   const purchasedItemsRef = useRef(purchasedItems);
+  const activeBackgroundRef = useRef<string | null>(null);
+  const activeFrameRef = useRef<string | null>(null);
+  const activeStickersRef = useRef<string[]>([]);
+
   useEffect(() => { totalStarsRef.current = totalStars; }, [totalStars]);
   useEffect(() => { planetProgressRef.current = planetProgress; }, [planetProgress]);
   useEffect(() => { purchasedItemsRef.current = purchasedItems; }, [purchasedItems]);
+  useEffect(() => { activeBackgroundRef.current = activeBackground; }, [activeBackground]);
+  useEffect(() => { activeFrameRef.current = activeFrame; }, [activeFrame]);
+  useEffect(() => { activeStickersRef.current = activeStickers; }, [activeStickers]);
 
   useEffect(() => {
     async function load() {
-      const [stars, progress, purchased] = await Promise.all([
+      const [stars, progress, purchased, activeItems] = await Promise.all([
         loadTotalStars(),
         loadPlanetProgress(),
         loadPurchasedItems(),
+        loadActiveItems(),
       ]);
       setTotalStars(stars);
       setPlanetProgress(progress);
       setPurchasedItems(purchased);
+      setActiveBackgroundState(activeItems.background);
+      setActiveFrameState(activeItems.frame);
+      setActiveStickersState(activeItems.stickers);
       setIsLoaded(true);
     }
     load();
@@ -65,6 +87,11 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         saveTotalStars(totalStarsRef.current);
         savePlanetProgress(planetProgressRef.current);
         savePurchasedItems(purchasedItemsRef.current);
+        saveActiveItems({
+          background: activeBackgroundRef.current,
+          frame: activeFrameRef.current,
+          stickers: activeStickersRef.current,
+        });
       }
     };
     const subscription = AppState.addEventListener('change', handler);
@@ -138,7 +165,6 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   const purchaseItem = useCallback(
     (itemId: string, cost: number): boolean => {
-      // Use refs to get latest values synchronously
       const currentStars = totalStarsRef.current;
       const currentPurchased = purchasedItemsRef.current;
 
@@ -159,14 +185,13 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       setTotalStars(newTotal);
       saveTotalStars(newTotal);
 
-      // Update refs immediately
       purchasedItemsRef.current = newItems;
       totalStarsRef.current = newTotal;
 
       console.log(`[ProgressContext] purchased item: ${itemId}, cost=${cost}, remaining stars=${newTotal}`);
       return true;
     },
-    [] // No dependencies — uses refs for latest values
+    []
   );
 
   const isItemPurchased = useCallback(
@@ -174,13 +199,52 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     [purchasedItems]
   );
 
+  const setActiveBackground = useCallback((id: string | null) => {
+    console.log(`[ProgressContext] setActiveBackground: ${id}`);
+    setActiveBackgroundState(id);
+    activeBackgroundRef.current = id;
+    saveActiveItems({
+      background: id,
+      frame: activeFrameRef.current,
+      stickers: activeStickersRef.current,
+    });
+  }, []);
+
+  const setActiveFrame = useCallback((id: string | null) => {
+    console.log(`[ProgressContext] setActiveFrame: ${id}`);
+    setActiveFrameState(id);
+    activeFrameRef.current = id;
+    saveActiveItems({
+      background: activeBackgroundRef.current,
+      frame: id,
+      stickers: activeStickersRef.current,
+    });
+  }, []);
+
+  const toggleActiveSticker = useCallback((id: string) => {
+    setActiveStickersState((prev) => {
+      const next = prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id];
+      console.log(`[ProgressContext] toggleActiveSticker: ${id}, active=${!prev.includes(id)}`);
+      saveActiveItems({
+        background: activeBackgroundRef.current,
+        frame: activeFrameRef.current,
+        stickers: next,
+      });
+      return next;
+    });
+  }, []);
+
   const resetProgress = useCallback(() => {
     setTotalStars(0);
     setPlanetProgress({});
     setPurchasedItems([]);
+    setActiveBackgroundState(null);
+    setActiveFrameState(null);
+    setActiveStickersState([]);
     saveTotalStars(0);
     savePlanetProgress({});
     savePurchasedItems([]);
+    saveActiveItems({ background: null, frame: null, stickers: [] });
     console.log('[ProgressContext] progress reset');
   }, []);
 
@@ -199,6 +263,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         purchaseItem,
         isItemPurchased,
         resetProgress,
+        activeBackground,
+        activeFrame,
+        activeStickers,
+        setActiveBackground,
+        setActiveFrame,
+        toggleActiveSticker,
       }}
     >
       {children}

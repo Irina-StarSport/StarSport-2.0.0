@@ -20,7 +20,7 @@ export interface Planet {
   exercises: Exercise[];
   starsReward: number;
   unlockAfter?: string;
-  imageUrl?: string;
+  imageUrl?: string; // optional — 'final' planet uses emoji only
 }
 
 export const PLANETS: Planet[] = [
@@ -33,6 +33,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(76,175,80,0.4)',
     starsReward: 2,
     unlockAfter: undefined,
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/The_Blue_Marble_%28remastered%29.jpg/240px-The_Blue_Marble_%28remastered%29.jpg',
     exercises: [
       {
         id: 'earth-1',
@@ -195,6 +196,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(200,216,232,0.4)',
     starsReward: 1,
     unlockAfter: 'earth',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/240px-FullMoon2010.jpg',
     exercises: [
       {
         id: 'moon-1',
@@ -281,7 +283,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,87,34,0.4)',
     starsReward: 2,
     unlockAfter: 'moon',
-    imageUrl: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=200&q=80',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/240px-OSIRIS_Mars_true_color.jpg',
     exercises: [
       {
         id: 'mars-1',
@@ -444,7 +446,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,152,0,0.4)',
     starsReward: 3,
     unlockAfter: 'mars',
-    imageUrl: 'https://images.unsplash.com/photo-1630839437035-dac17da580d0?w=200&q=80',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter.jpg/240px-Jupiter.jpg',
     exercises: [
       {
         id: 'jupiter-1',
@@ -607,7 +609,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(33,150,243,0.4)',
     starsReward: 3,
     unlockAfter: 'jupiter',
-    imageUrl: 'https://images.unsplash.com/photo-1614313913007-2b4ae8ce32d6?w=200&q=80',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/240px-Neptune_Full.jpg',
     exercises: [
       {
         id: 'neptune-1',

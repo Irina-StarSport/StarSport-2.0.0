@@ -23,7 +23,7 @@ import { BookOpen, ShoppingBag } from 'lucide-react-native';
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { totalStars, planetProgress, isPlanetUnlocked, getPlanetStars } = useProgress();
+  const { totalStars, planetProgress, isPlanetUnlocked, getPlanetStars, activeBackground } = useProgress();
   const { settings } = useSettings();
   const lang = settings.language;
 
@@ -65,8 +65,13 @@ export default function HomeScreen() {
     router.push('/shop');
   };
 
+  const bgTint = activeBackground === 'bg-nebula' ? '#3d0066'
+    : activeBackground === 'bg-galaxy' ? '#000066'
+    : activeBackground === 'bg-aurora' ? '#006666'
+    : undefined;
+
   return (
-    <CosmicBackground style={styles.container}>
+    <CosmicBackground style={styles.container} tintColor={bgTint}>
       {/* Header */}
       <Animated.View
         style={[
