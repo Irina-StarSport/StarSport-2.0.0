@@ -11,7 +11,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { PlanetCard } from '@/components/PlanetCard';
 import { StarCounter } from '@/components/StarCounter';
-import { MusicMiniPlayer } from '@/components/MusicMiniPlayer';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
@@ -131,7 +130,7 @@ export default function HomeScreen() {
       {/* Content */}
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: 16 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.sectionTitle}>{t(lang, 'choosePlanet')}</Text>
@@ -157,10 +156,6 @@ export default function HomeScreen() {
         })}
       </ScrollView>
 
-      {/* Music mini player */}
-      <View style={{ paddingBottom: insets.bottom }}>
-        <MusicMiniPlayer />
-      </View>
     </CosmicBackground>
   );
 }
