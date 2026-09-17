@@ -1,10 +1,10 @@
 {
   "expo": {
     "name": "StarSport",
-    "slug": "starsport-health-planet-cqqnkt",
-    "version": "2.0.0",
+    "slug": "starsport",
+    "version": "2.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/app-icon-xke.png",
+    "icon": "./assets/images/01a952fb-4338-49c1-9baf-934af072e720.jpeg",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/app-icon-xke.png",
@@ -12,6 +12,7 @@
       "backgroundColor": "#FFFFFF"
     },
     "ios": {
+      "icon": "./assets/images/01a952fb-4338-49c1-9baf-934af072e720.jpeg",
       "supportsTablet": true,
       "bundleIdentifier": "com.starsport.app",
       "infoPlist": {
@@ -21,11 +22,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/app-icon-xke.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/images/01a952fb-4338-49c1-9baf-934af072e720.jpeg",
+        "backgroundColor": "#0a0a2e"
       },
       "package": "com.starsport.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "permissions": [
         "android.permission.READ_MEDIA_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE"
