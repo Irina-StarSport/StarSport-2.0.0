@@ -4,7 +4,7 @@
     "slug": "starsport",
     "version": "2.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/01a952fb-4338-49c1-9baf-934af072e720.jpeg",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/app-icon-xke.png",
