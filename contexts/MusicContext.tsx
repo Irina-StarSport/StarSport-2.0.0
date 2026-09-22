@@ -17,41 +17,39 @@ export interface Track {
   duration?: string;
 }
 
-const BASE_URL = 'https://raw.githubusercontent.com/btahir/open-lofi/main/tracks';
-
 const PRESET_TRACKS: Track[] = [
   {
     id: 'preset-1',
     name: 'Космическое путешествие',
-    uri: `${BASE_URL}/ambient-lofi/deep-space-loop.mp3`,
+    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     isPreset: true,
     duration: '3:45',
   },
   {
     id: 'preset-2',
     name: 'Звёздный марш',
-    uri: `${BASE_URL}/ambient-lofi/orbiting-in-silence.mp3`,
+    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
     isPreset: true,
     duration: '2:30',
   },
   {
     id: 'preset-3',
     name: 'Лунная соната',
-    uri: `${BASE_URL}/ambient-lofi/satellite-lullaby.mp3`,
+    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
     isPreset: true,
     duration: '4:10',
   },
   {
     id: 'preset-4',
     name: 'Марсианский ритм',
-    uri: `${BASE_URL}/ambient-lofi/aurora-on-mute.mp3`,
+    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
     isPreset: true,
     duration: '3:00',
   },
   {
     id: 'preset-5',
     name: 'Нептунские волны',
-    uri: `${BASE_URL}/ambient-lofi/warm-constellations.mp3`,
+    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
     isPreset: true,
     duration: '5:20',
   },
