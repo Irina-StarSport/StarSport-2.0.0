@@ -1,4 +1,4 @@
-// force-reload 2.0.2
+// sync-2.0.2
 import React, { useEffect, useRef } from 'react';
 import {
   View,

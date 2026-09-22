@@ -31,11 +31,11 @@ const ACHIEVEMENTS: Achievement[] = [
     isUnlocked: (_, __, total) => total >= 1,
   },
   {
-    id: 'moon-traveler',
-    emoji: '🌕',
-    name: 'Лунный путешественник',
-    description: 'Пройди все упражнения на Луне',
-    isUnlocked: (_, planets) => planets.includes('moon'),
+    id: 'venus-traveler',
+    emoji: '🌸',
+    name: 'Венерианский путешественник',
+    description: 'Пройди все упражнения на Венере',
+    isUnlocked: (_, planets) => planets.includes('venus'),
   },
   {
     id: 'earth-hero',
@@ -71,7 +71,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Покоритель космоса',
     description: 'Пройди все планеты',
     isUnlocked: (_, planets) =>
-      ['moon', 'earth', 'mars', 'jupiter', 'neptune', 'final'].every((p) =>
+      ['venus', 'earth', 'mars', 'jupiter', 'neptune', 'final'].every((p) =>
         planets.includes(p)
       ),
   },
