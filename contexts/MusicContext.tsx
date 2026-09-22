@@ -99,13 +99,19 @@ function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
       console.log('[AudioEngine] calling player.pause()');
       player.pause();
     }
-  }, [isPlaying, uri]);
+  }, [isPlaying]);
 
-  // Auto-play when the track changes (uri changes → new player → play if needed)
+  // Stop old player and auto-play when the track (uri) changes
   useEffect(() => {
-    if (!uri || !isPlaying) return;
+    if (!uri) return;
     console.log('[AudioEngine] track changed, auto-playing:', uri);
-    player.play();
+    if (isPlaying) {
+      player.play();
+    }
+    return () => {
+      console.log('[AudioEngine] uri cleanup — pausing old player');
+      player.pause();
+    };
   }, [uri]);
 
   // Sync volume
