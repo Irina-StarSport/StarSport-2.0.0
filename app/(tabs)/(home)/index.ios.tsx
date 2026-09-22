@@ -11,17 +11,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { PlanetCard } from '@/components/PlanetCard';
 import { StarCounter } from '@/components/StarCounter';
-import { MusicMiniPlayer } from '@/components/MusicMiniPlayer';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { PLANETS } from '@/constants/planets';
+import { SHOP_ITEMS } from '@/constants/shopItems';
 import { useProgress } from '@/contexts/ProgressContext';
-import { BookOpen } from 'lucide-react-native';
+import { useSettings } from '@/contexts/SettingsContext';
+import { t } from '@/constants/translations';
+import { BookOpen, ShoppingBag } from 'lucide-react-native';
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { totalStars, planetProgress, isPlanetUnlocked, getPlanetStars } = useProgress();
+  const { totalStars, planetProgress, isPlanetUnlocked, getPlanetStars, activeBackground, activeStickers } = useProgress();
+  const { settings } = useSettings();
+  const lang = settings.language;
 
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(-12)).current;
@@ -56,8 +60,18 @@ export default function HomeScreen() {
     router.push('/guide');
   };
 
+  const handleShopPress = () => {
+    console.log('[HomeScreen] shop button pressed');
+    router.push('/shop');
+  };
+
+  const bgTint = activeBackground === 'bg-nebula' ? '#3d0066'
+    : activeBackground === 'bg-galaxy' ? '#000066'
+    : activeBackground === 'bg-aurora' ? '#006666'
+    : undefined;
+
   return (
-    <CosmicBackground style={styles.container}>
+    <CosmicBackground style={styles.container} tintColor={bgTint}>
       {/* Header */}
       <Animated.View
         style={[
@@ -67,8 +81,20 @@ export default function HomeScreen() {
         ]}
       >
         <View style={styles.headerLeft}>
-          <Text style={styles.appTitle}>StarSport</Text>
-          <Text style={styles.appSubtitle}>Планета Здоровья</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.appTitle}>StarSport</Text>
+            {activeStickers.length > 0 && (
+              <View style={styles.titleStickers}>
+                {activeStickers.slice(0, 2).map((id) => {
+                  const item = SHOP_ITEMS.find((s) => s.id === id);
+                  return item ? (
+                    <Text key={id} style={styles.titleStickerEmoji}>{item.emoji}</Text>
+                  ) : null;
+                })}
+              </View>
+            )}
+          </View>
+          <Text style={styles.appSubtitle}>{t(lang, 'appSubtitle')}</Text>
         </View>
         <View style={styles.headerRight}>
           <AnimatedPressable
@@ -81,12 +107,22 @@ export default function HomeScreen() {
             </View>
           </AnimatedPressable>
           <AnimatedPressable
+            onPress={handleShopPress}
+            accessibilityLabel="Магазин наград"
+            accessibilityRole="button"
+          >
+            <View style={styles.iconButton}>
+              <ShoppingBag size={22} color={COLORS.text} />
+            </View>
+          </AnimatedPressable>
+          <AnimatedPressable
             onPress={handleGuidePress}
-            style={styles.guideButton}
             accessibilityLabel="Руководство пользователя"
             accessibilityRole="button"
           >
-            <BookOpen size={22} color={COLORS.textSecondary} />
+            <View style={styles.iconButton}>
+              <BookOpen size={22} color={COLORS.text} />
+            </View>
           </AnimatedPressable>
         </View>
       </Animated.View>
@@ -94,12 +130,12 @@ export default function HomeScreen() {
       {/* Content */}
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: 16 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Выбери планету</Text>
+        <Text style={styles.sectionTitle}>{t(lang, 'choosePlanet')}</Text>
         <Text style={styles.sectionSubtitle}>
-          Путешествуй по Солнечной системе и выполняй упражнения
+          {t(lang, 'choosePlanetSubtitle')}
         </Text>
 
         {PLANETS.map((planet, index) => {
@@ -120,10 +156,6 @@ export default function HomeScreen() {
         })}
       </ScrollView>
 
-      {/* Music mini player */}
-      <View style={{ paddingBottom: insets.bottom }}>
-        <MusicMiniPlayer />
-      </View>
     </CosmicBackground>
   );
 }
@@ -141,6 +173,18 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     gap: 2,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  titleStickers: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  titleStickerEmoji: {
+    fontSize: 22,
   },
   appTitle: {
     fontSize: 28,
@@ -166,7 +210,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.primary + '30',
   },
-  guideButton: {
+  iconButton: {
     width: 44,
     height: 44,
     borderRadius: 22,

@@ -2,28 +2,59 @@ import React, {
   createContext,
   useContext,
   useEffect,
-  useRef,
   useState,
   useCallback,
   useMemo,
 } from 'react';
-import { useAudioPlayer, AudioPlayer } from 'expo-audio';
+import { useAudioPlayer } from 'expo-audio';
 import { loadCustomTracks, saveCustomTracks, CustomTrack } from '@/utils/storage';
 
 export interface Track {
   id: string;
   name: string;
-  uri: string | null; // null = preset placeholder (no actual file)
+  uri: string | null;
   isPreset: boolean;
   duration?: string;
 }
 
+const BASE_URL = 'https://raw.githubusercontent.com/btahir/open-lofi/main/tracks';
+
 const PRESET_TRACKS: Track[] = [
-  { id: 'preset-1', name: 'Космическое путешествие', uri: null, isPreset: true, duration: '3:45' },
-  { id: 'preset-2', name: 'Звёздный марш', uri: null, isPreset: true, duration: '2:30' },
-  { id: 'preset-3', name: 'Лунная соната', uri: null, isPreset: true, duration: '4:10' },
-  { id: 'preset-4', name: 'Марсианский ритм', uri: null, isPreset: true, duration: '3:00' },
-  { id: 'preset-5', name: 'Нептунские волны', uri: null, isPreset: true, duration: '5:20' },
+  {
+    id: 'preset-1',
+    name: 'Космическое путешествие',
+    uri: `${BASE_URL}/ambient-lofi/deep-space-loop.mp3`,
+    isPreset: true,
+    duration: '3:45',
+  },
+  {
+    id: 'preset-2',
+    name: 'Звёздный марш',
+    uri: `${BASE_URL}/ambient-lofi/orbiting-in-silence.mp3`,
+    isPreset: true,
+    duration: '2:30',
+  },
+  {
+    id: 'preset-3',
+    name: 'Лунная соната',
+    uri: `${BASE_URL}/ambient-lofi/satellite-lullaby.mp3`,
+    isPreset: true,
+    duration: '4:10',
+  },
+  {
+    id: 'preset-4',
+    name: 'Марсианский ритм',
+    uri: `${BASE_URL}/ambient-lofi/aurora-on-mute.mp3`,
+    isPreset: true,
+    duration: '3:00',
+  },
+  {
+    id: 'preset-5',
+    name: 'Нептунские волны',
+    uri: `${BASE_URL}/ambient-lofi/warm-constellations.mp3`,
+    isPreset: true,
+    duration: '5:20',
+  },
 ];
 
 interface MusicContextType {
@@ -44,12 +75,57 @@ interface MusicContextType {
 
 const MusicContext = createContext<MusicContextType | null>(null);
 
+// ─── AudioEngine ────────────────────────────────────────────────────────────
+// Rendered inside MusicProvider so it can legally call hooks.
+// It owns the single AudioPlayer instance and syncs it to context state.
+
+interface AudioEngineProps {
+  uri: string | null;
+  isPlaying: boolean;
+  volume: number;
+}
+
+function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
+  // useAudioPlayer re-creates the player whenever the source changes
+  // (the hook uses JSON.stringify(source) as its dep key internally)
+  const source = uri ? { uri } : null;
+  const player = useAudioPlayer(source);
+
+  // Sync play/pause state
+  useEffect(() => {
+    if (!uri) return;
+    if (isPlaying) {
+      console.log('[AudioEngine] calling player.play()');
+      player.play();
+    } else {
+      console.log('[AudioEngine] calling player.pause()');
+      player.pause();
+    }
+  }, [isPlaying, uri]);
+
+  // Auto-play when the track changes (uri changes → new player → play if needed)
+  useEffect(() => {
+    if (!uri || !isPlaying) return;
+    console.log('[AudioEngine] track changed, auto-playing:', uri);
+    player.play();
+  }, [uri]);
+
+  // Sync volume
+  useEffect(() => {
+    player.volume = volume;
+    console.log('[AudioEngine] volume set to', volume);
+  }, [volume, player]);
+
+  return null;
+}
+
+// ─── MusicProvider ───────────────────────────────────────────────────────────
+
 export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [customTracks, setCustomTracks] = useState<Track[]>([]);
   const [volume, setVolumeState] = useState(0.8);
-  const playerRef = useRef<AudioPlayer | null>(null);
 
   const setVolume = useCallback((v: number) => {
     console.log(`[MusicContext] setVolume: ${v}`);
@@ -74,13 +150,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     console.log(`[MusicContext] play: track=${track.name}, uri=${track.uri}`);
     setCurrentTrack(track);
     setIsPlaying(true);
-    // Preset tracks have no actual audio file — just update UI state
-    if (!track.uri) {
-      return;
-    }
-    // For custom tracks with real URIs, playback would be handled here
-    // expo-audio useAudioPlayer is a hook so we can't call it imperatively
-    // We set state and let the player component handle it
   }, []);
 
   const pause = useCallback(() => {
@@ -173,6 +242,11 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         setVolume,
       }}
     >
+      <AudioEngine
+        uri={currentTrack?.uri ?? null}
+        isPlaying={isPlaying}
+        volume={volume}
+      />
       {children}
     </MusicContext.Provider>
   );
