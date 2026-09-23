@@ -18,7 +18,8 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSDocumentPickerUsageDescription": "StarSport needs access to your files so you can add your own music tracks for workouts.",
-        "NSAppleMusicUsageDescription": "\u0414\u043b\u044f \u0432\u043e\u0441\u043f\u0440\u043e\u0438\u0437\u0432\u0435\u0434\u0435\u043d\u0438\u044f \u0432\u0430\u0448\u0435\u0439 \u043c\u0443\u0437\u044b\u043a\u0438 \u0432\u043e \u0432\u0440\u0435\u043c\u044f \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438"
+        "NSAppleMusicUsageDescription": "\u0414\u043b\u044f \u0432\u043e\u0441\u043f\u0440\u043e\u0438\u0437\u0432\u0435\u0434\u0435\u043d\u0438\u044f \u0432\u0430\u0448\u0435\u0439 \u043c\u0443\u0437\u044b\u043a\u0438 \u0432\u043e \u0432\u0440\u0435\u043c\u044f \u0442\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043a\u0438",
+        "NSPhotoLibraryUsageDescription": "StarSport needs access to your photo library to let you select audio files for workouts."
       }
     },
     "android": {
@@ -30,8 +31,10 @@
       "versionCode": 10,
       "permissions": [
         "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.INTERNET"
+        "android.permission.INTERNET",
+        "READ_MEDIA_IMAGES"
       ],
       "usesCleartextTraffic": false
     },
