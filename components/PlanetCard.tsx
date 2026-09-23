@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { Planet } from '@/constants/planets';
-import { Lock } from 'lucide-react-native';
+import { Lock, CheckCircle, XCircle } from 'lucide-react-native';
 
 interface PlanetCardProps {
   planet: Planet;
@@ -46,8 +46,11 @@ export function PlanetCard({
   const total = planet.exercises.length;
   const progress = total > 0 ? completedCount / total : 0;
   const progressPercent = Math.round(progress * 100);
+  const isFullyCompleted = completedCount >= total && total > 0;
 
   const completedText = `Пройдено: ${completedCount}/${total} упражнений`;
+
+  const nameColor = isLocked ? 'rgba(255,215,0,0.4)' : '#FFD700';
 
   return (
     <Animated.View style={{ opacity, transform: [{ translateY }] }}>
@@ -77,7 +80,7 @@ export function PlanetCard({
           />
 
           <View style={styles.row}>
-            {/* Planet emoji */}
+            {/* Planet emoji / image */}
             <View style={styles.emojiContainer}>
               {planet.imageUrl && !imageError ? (
                 <Image
@@ -98,7 +101,19 @@ export function PlanetCard({
             {/* Info */}
             <View style={styles.info}>
               <View style={styles.nameRow}>
-                <Text style={[styles.name, { color: isLocked ? COLORS.textTertiary : planet.color }]}>
+                {/* Status icon before name */}
+                {isLocked ? (
+                  <XCircle size={18} color="#FF5252" />
+                ) : isFullyCompleted ? (
+                  <CheckCircle size={18} color="#4CAF50" />
+                ) : null}
+
+                <Text
+                  style={[
+                    styles.name,
+                    { color: nameColor, textShadowColor: 'rgba(255,215,0,0.3)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 6 },
+                  ]}
+                >
                   {planet.name}
                 </Text>
                 <Text style={styles.subtitle}>{planet.subtitle}</Text>
@@ -188,7 +203,7 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   name: {
     fontSize: 18,

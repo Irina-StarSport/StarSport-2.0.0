@@ -7,7 +7,7 @@ import React, {
   useMemo,
 } from 'react';
 import { useAudioPlayer } from 'expo-audio';
-import { loadCustomTracks, saveCustomTracks, CustomTrack } from '@/utils/storage';
+import * as MediaLibrary from 'expo-media-library';
 
 export interface Track {
   id: string;
@@ -17,56 +17,21 @@ export interface Track {
   duration?: string;
 }
 
-const PRESET_TRACKS: Track[] = [
-  {
-    id: 'preset-1',
-    name: 'Космическое путешествие',
-    uri: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3',
-    isPreset: true,
-    duration: '3:45',
-  },
-  {
-    id: 'preset-2',
-    name: 'Звёздный марш',
-    uri: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_01_-_Interlude.mp3',
-    isPreset: true,
-    duration: '2:30',
-  },
-  {
-    id: 'preset-3',
-    name: 'Лунная соната',
-    uri: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Broke_For_Free/Directionless_EP/Broke_For_Free_-_01_-_Night_Owl.mp3',
-    isPreset: true,
-    duration: '4:10',
-  },
-  {
-    id: 'preset-4',
-    name: 'Марсианский ритм',
-    uri: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_02_-_Moonlight_Reprise.mp3',
-    isPreset: true,
-    duration: '3:00',
-  },
-  {
-    id: 'preset-5',
-    name: 'Нептунские волны',
-    uri: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Broke_For_Free/Directionless_EP/Broke_For_Free_-_04_-_Murmuration.mp3',
-    isPreset: true,
-    duration: '5:20',
-  },
-];
-
 interface MusicContextType {
   currentTrack: Track | null;
   isPlaying: boolean;
   tracks: Track[];
-  customTracks: Track[];
+  deviceTracks: Track[];
   play: (track: Track) => void;
   pause: () => void;
   resume: () => void;
   next: () => void;
   previous: () => void;
-  addCustomTrack: (uri: string, name: string) => void;
-  removeCustomTrack: (id: string) => void;
+  loadMoreTracks: () => void;
+  hasMoreTracks: boolean;
+  isLoadingTracks: boolean;
+  permissionStatus: MediaLibrary.PermissionStatus | null;
+  requestPermission: () => Promise<void>;
   volume: number;
   setVolume: (v: number) => void;
 }
@@ -74,8 +39,6 @@ interface MusicContextType {
 const MusicContext = createContext<MusicContextType | null>(null);
 
 // ─── AudioEngine ────────────────────────────────────────────────────────────
-// Rendered inside MusicProvider so it can legally call hooks.
-// It owns the single AudioPlayer instance and syncs it to context state.
 
 interface AudioEngineProps {
   uri: string | null;
@@ -84,12 +47,9 @@ interface AudioEngineProps {
 }
 
 function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
-  // useAudioPlayer re-creates the player whenever the source changes
-  // (the hook uses JSON.stringify(source) as its dep key internally)
   const source = uri ? { uri } : null;
   const player = useAudioPlayer(source);
 
-  // Sync play/pause state
   useEffect(() => {
     if (!uri) return;
     if (isPlaying) {
@@ -102,7 +62,6 @@ function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
     }
   }, [isPlaying]);
 
-  // Stop old player and auto-play when the track (uri) changes
   useEffect(() => {
     if (!uri) return;
     console.log('[AudioEngine] track changed, auto-playing:', uri);
@@ -116,7 +75,6 @@ function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
     };
   }, [uri]);
 
-  // Sync volume
   useEffect(() => {
     player.volume = volume;
     console.log('[AudioEngine] volume set to', volume);
@@ -125,32 +83,96 @@ function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
   return null;
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  const sPadded = s < 10 ? `0${s}` : `${s}`;
+  return `${m}:${sPadded}`;
+}
+
+function assetToTrack(asset: MediaLibrary.Asset): Track {
+  return {
+    id: asset.id,
+    name: asset.filename.replace(/\.[^/.]+$/, ''),
+    uri: asset.uri,
+    isPreset: false,
+    duration: asset.duration > 0 ? formatDuration(asset.duration) : undefined,
+  };
+}
+
+const PAGE_SIZE = 30;
+
 // ─── MusicProvider ───────────────────────────────────────────────────────────
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [customTracks, setCustomTracks] = useState<Track[]>([]);
+  const [deviceTracks, setDeviceTracks] = useState<Track[]>([]);
   const [volume, setVolumeState] = useState(0.8);
+  const [permissionStatus, setPermissionStatus] = useState<MediaLibrary.PermissionStatus | null>(null);
+  const [isLoadingTracks, setIsLoadingTracks] = useState(false);
+  const [hasMoreTracks, setHasMoreTracks] = useState(false);
+  const [endCursor, setEndCursor] = useState<string | undefined>(undefined);
 
   const setVolume = useCallback((v: number) => {
     console.log(`[MusicContext] setVolume: ${v}`);
     setVolumeState(v);
   }, []);
 
-  const allTracks = useMemo(() => [...PRESET_TRACKS, ...customTracks], [customTracks]);
+  const loadTracks = useCallback(async (after?: string) => {
+    console.log('[MusicContext] loadTracks called, after=', after);
+    setIsLoadingTracks(true);
+    try {
+      const result = await MediaLibrary.getAssetsAsync({
+        mediaType: MediaLibrary.MediaType.audio,
+        first: PAGE_SIZE,
+        after,
+        sortBy: MediaLibrary.SortBy.default,
+      });
+      console.log(`[MusicContext] loaded ${result.assets.length} audio assets, hasNextPage=${result.hasNextPage}`);
+      const newTracks = result.assets.map(assetToTrack);
+      setDeviceTracks((prev) => (after ? [...prev, ...newTracks] : newTracks));
+      setHasMoreTracks(result.hasNextPage);
+      setEndCursor(result.hasNextPage ? result.endCursor : undefined);
+    } catch (err) {
+      console.log('[MusicContext] loadTracks error:', err);
+    } finally {
+      setIsLoadingTracks(false);
+    }
+  }, []);
+
+  const requestPermission = useCallback(async () => {
+    console.log('[MusicContext] requestPermission called');
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    console.log('[MusicContext] permission status:', status);
+    setPermissionStatus(status);
+    if (status === MediaLibrary.PermissionStatus.GRANTED) {
+      await loadTracks();
+    }
+  }, [loadTracks]);
 
   useEffect(() => {
-    loadCustomTracks().then((saved) => {
-      const tracks: Track[] = saved.map((t: CustomTrack) => ({
-        id: t.id,
-        name: t.name,
-        uri: t.uri,
-        isPreset: false,
-      }));
-      setCustomTracks(tracks);
-    });
+    (async () => {
+      console.log('[MusicContext] checking existing permissions');
+      const { status } = await MediaLibrary.getPermissionsAsync();
+      console.log('[MusicContext] existing permission status:', status);
+      setPermissionStatus(status);
+      if (status === MediaLibrary.PermissionStatus.GRANTED) {
+        await loadTracks();
+      }
+    })();
   }, []);
+
+  const loadMoreTracks = useCallback(() => {
+    console.log('[MusicContext] loadMoreTracks called, endCursor=', endCursor);
+    if (hasMoreTracks && endCursor && !isLoadingTracks) {
+      loadTracks(endCursor);
+    }
+  }, [hasMoreTracks, endCursor, isLoadingTracks, loadTracks]);
+
+  const allTracks = useMemo(() => deviceTracks, [deviceTracks]);
 
   const play = useCallback((track: Track) => {
     console.log(`[MusicContext] play: track=${track.name}, uri=${track.uri}`);
@@ -172,6 +194,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const next = useCallback(() => {
     console.log('[MusicContext] next');
+    if (allTracks.length === 0) return;
     if (!currentTrack) {
       play(allTracks[0]);
       return;
@@ -183,6 +206,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const previous = useCallback(() => {
     console.log('[MusicContext] previous');
+    if (allTracks.length === 0) return;
     if (!currentTrack) {
       play(allTracks[allTracks.length - 1]);
       return;
@@ -192,58 +216,23 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     play(allTracks[prevIdx]);
   }, [currentTrack, allTracks, play]);
 
-  const addCustomTrack = useCallback(
-    (uri: string, name: string) => {
-      console.log(`[MusicContext] addCustomTrack: name=${name}, uri=${uri}`);
-      const newTrack: Track = {
-        id: `custom-${Date.now()}`,
-        name,
-        uri,
-        isPreset: false,
-      };
-      setCustomTracks((prev) => {
-        const updated = [...prev, newTrack];
-        saveCustomTracks(
-          updated.map((t) => ({ id: t.id, name: t.name, uri: t.uri ?? '' }))
-        );
-        return updated;
-      });
-    },
-    []
-  );
-
-  const removeCustomTrack = useCallback(
-    (id: string) => {
-      console.log(`[MusicContext] removeCustomTrack: id=${id}`);
-      setCustomTracks((prev) => {
-        const updated = prev.filter((t) => t.id !== id);
-        saveCustomTracks(
-          updated.map((t) => ({ id: t.id, name: t.name, uri: t.uri ?? '' }))
-        );
-        return updated;
-      });
-      if (currentTrack?.id === id) {
-        setCurrentTrack(null);
-        setIsPlaying(false);
-      }
-    },
-    [currentTrack]
-  );
-
   return (
     <MusicContext.Provider
       value={{
         currentTrack,
         isPlaying,
-        tracks: PRESET_TRACKS,
-        customTracks,
+        tracks: deviceTracks,
+        deviceTracks,
         play,
         pause,
         resume,
         next,
         previous,
-        addCustomTrack,
-        removeCustomTrack,
+        loadMoreTracks,
+        hasMoreTracks,
+        isLoadingTracks,
+        permissionStatus,
+        requestPermission,
         volume,
         setVolume,
       }}

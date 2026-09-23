@@ -5,9 +5,10 @@ import {
   ScrollView,
   StyleSheet,
   Animated,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as DocumentPicker from 'expo-document-picker';
+import * as MediaLibrary from 'expo-media-library';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
@@ -17,9 +18,8 @@ import {
   Pause,
   SkipBack,
   SkipForward,
-  Plus,
-  Trash2,
   Music2,
+  Music,
 } from 'lucide-react-native';
 
 export default function MusicScreen() {
@@ -27,15 +27,17 @@ export default function MusicScreen() {
   const {
     currentTrack,
     isPlaying,
-    tracks,
-    customTracks,
+    deviceTracks,
     play,
     pause,
     resume,
     next,
     previous,
-    addCustomTrack,
-    removeCustomTrack,
+    loadMoreTracks,
+    hasMoreTracks,
+    isLoadingTracks,
+    permissionStatus,
+    requestPermission,
   } = useMusic();
 
   const headerOpacity = useRef(new Animated.Value(0)).current;
@@ -48,24 +50,6 @@ export default function MusicScreen() {
       useNativeDriver: true,
     }).start();
   }, []);
-
-  const handlePickDocument = async () => {
-    console.log('[MusicScreen] pick document pressed');
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: 'audio/*',
-        copyToCacheDirectory: true,
-      });
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        const name = asset.name.replace(/\.[^/.]+$/, '');
-        console.log(`[MusicScreen] document picked: name=${name}, uri=${asset.uri}`);
-        addCustomTrack(asset.uri, name);
-      }
-    } catch (err) {
-      console.log('[MusicScreen] document picker error:', err);
-    }
-  };
 
   const handlePlayPause = (track: Track) => {
     console.log(`[MusicScreen] play/pause: track=${track.name}, currentTrack=${currentTrack?.id}, isPlaying=${isPlaying}`);
@@ -90,19 +74,72 @@ export default function MusicScreen() {
     previous();
   };
 
-  const handleRemoveTrack = (id: string) => {
-    console.log(`[MusicScreen] remove track: id=${id}`);
-    removeCustomTrack(id);
+  const handleRequestPermission = async () => {
+    console.log('[MusicScreen] request permission button pressed');
+    await requestPermission();
   };
 
-  const allTracks = [...tracks, ...customTracks];
-  void allTracks;
+  const handleLoadMore = () => {
+    console.log('[MusicScreen] load more pressed');
+    loadMoreTracks();
+  };
+
+  const isGranted = permissionStatus === MediaLibrary.PermissionStatus.GRANTED;
+  const isDenied =
+    permissionStatus === MediaLibrary.PermissionStatus.DENIED ||
+    permissionStatus === MediaLibrary.PermissionStatus.UNDETERMINED;
+
+  // Permission not yet determined — show nothing while checking
+  if (permissionStatus === null) {
+    return (
+      <CosmicBackground style={styles.container}>
+        <View style={[styles.centerState, { paddingTop: insets.top }]}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </CosmicBackground>
+    );
+  }
+
+  // Permission denied / not granted — show permission request screen
+  if (!isGranted) {
+    return (
+      <CosmicBackground style={styles.container}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+          <Text style={styles.headerTitle}>
+            Музыка 🎵
+          </Text>
+        </View>
+        <View style={styles.permissionContainer}>
+          <Text style={styles.permissionEmoji}>🎵</Text>
+          <Text style={styles.permissionTitle}>Доступ к музыке</Text>
+          <Text style={styles.permissionSubtitle}>
+            Разреши доступ к медиатеке, чтобы слушать свою музыку во время тренировок
+          </Text>
+          <AnimatedPressable
+            onPress={handleRequestPermission}
+            style={styles.permissionButton}
+            accessibilityLabel="Разрешить доступ к музыке"
+            accessibilityRole="button"
+          >
+            <Text style={styles.permissionButtonText}>Разрешить доступ к музыке</Text>
+          </AnimatedPressable>
+          {isDenied && permissionStatus === MediaLibrary.PermissionStatus.DENIED && (
+            <Text style={styles.permissionHint}>
+              Если кнопка не работает, разреши доступ вручную в настройках устройства
+            </Text>
+          )}
+        </View>
+      </CosmicBackground>
+    );
+  }
 
   return (
     <CosmicBackground style={styles.container}>
-      {/* Custom header */}
+      {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.headerTitle}>Музыка 🎵</Text>
+        <Text style={styles.headerTitle}>
+          Музыка 🎵
+        </Text>
       </View>
 
       <ScrollView
@@ -164,9 +201,30 @@ export default function MusicScreen() {
           </View>
         )}
 
-        {/* Preset tracks */}
-        <Text style={styles.sectionTitle}>Встроенные треки</Text>
-        {tracks.map((track, index) => (
+        {/* Device tracks section */}
+        <Text style={styles.sectionTitle}>Музыка с устройства</Text>
+
+        {/* Loading state */}
+        {isLoadingTracks && deviceTracks.length === 0 && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="small" color={COLORS.primary} />
+            <Text style={styles.loadingText}>Загрузка треков...</Text>
+          </View>
+        )}
+
+        {/* Empty state */}
+        {!isLoadingTracks && deviceTracks.length === 0 && (
+          <View style={styles.emptyState}>
+            <Music size={40} color={COLORS.textTertiary} />
+            <Text style={styles.emptyTitle}>Аудиофайлы не найдены</Text>
+            <Text style={styles.emptySubtitle}>
+              На устройстве не найдено аудиофайлов
+            </Text>
+          </View>
+        )}
+
+        {/* Track list */}
+        {deviceTracks.map((track, index) => (
           <TrackRow
             key={track.id}
             track={track}
@@ -177,40 +235,20 @@ export default function MusicScreen() {
           />
         ))}
 
-        {/* Custom tracks */}
-        <View style={styles.customHeader}>
-          <Text style={styles.sectionTitle}>Моя музыка</Text>
+        {/* Load more */}
+        {hasMoreTracks && (
           <AnimatedPressable
-            onPress={handlePickDocument}
-            style={styles.addButton}
-            accessibilityLabel="Добавить свою музыку"
+            onPress={handleLoadMore}
+            style={styles.loadMoreButton}
+            accessibilityLabel="Загрузить ещё треки"
             accessibilityRole="button"
           >
-            <Plus size={18} color={COLORS.primary} />
-            <Text style={styles.addButtonText}>Добавить</Text>
+            {isLoadingTracks ? (
+              <ActivityIndicator size="small" color={COLORS.primary} />
+            ) : (
+              <Text style={styles.loadMoreText}>Загрузить ещё</Text>
+            )}
           </AnimatedPressable>
-        </View>
-
-        {customTracks.length === 0 ? (
-          <View style={styles.emptyCustom}>
-            <Text style={styles.emptyEmoji}>🎵</Text>
-            <Text style={styles.emptyTitle}>Нет своей музыки</Text>
-            <Text style={styles.emptySubtitle}>
-              Нажми "Добавить" чтобы загрузить свои аудиофайлы
-            </Text>
-          </View>
-        ) : (
-          customTracks.map((track, index) => (
-            <TrackRow
-              key={track.id}
-              track={track}
-              isActive={currentTrack?.id === track.id}
-              isPlaying={isPlaying && currentTrack?.id === track.id}
-              onPlayPause={() => handlePlayPause(track)}
-              onDelete={() => handleRemoveTrack(track.id)}
-              index={index}
-            />
-          ))
         )}
       </ScrollView>
     </CosmicBackground>
@@ -222,14 +260,12 @@ function TrackRow({
   isActive,
   isPlaying,
   onPlayPause,
-  onDelete,
   index,
 }: {
   track: Track;
   isActive: boolean;
   isPlaying: boolean;
   onPlayPause: () => void;
-  onDelete?: () => void;
   index: number;
 }) {
   const opacity = useRef(new Animated.Value(0)).current;
@@ -240,13 +276,13 @@ function TrackRow({
       Animated.timing(opacity, {
         toValue: 1,
         duration: 300,
-        delay: index * 50,
+        delay: Math.min(index, 20) * 40,
         useNativeDriver: true,
       }),
       Animated.timing(translateX, {
         toValue: 0,
         duration: 300,
-        delay: index * 50,
+        delay: Math.min(index, 20) * 40,
         useNativeDriver: true,
       }),
     ]).start();
@@ -285,21 +321,7 @@ function TrackRow({
           {track.duration && (
             <Text style={styles.trackDuration}>{track.duration}</Text>
           )}
-          {!track.isPreset && (
-            <Text style={styles.trackCustomLabel}>Своя музыка</Text>
-          )}
         </View>
-
-        {onDelete && (
-          <AnimatedPressable
-            onPress={onDelete}
-            style={styles.deleteBtn}
-            accessibilityLabel={`Удалить ${track.name}`}
-            accessibilityRole="button"
-          >
-            <Trash2 size={18} color={COLORS.danger} />
-          </AnimatedPressable>
-        )}
       </View>
     </Animated.View>
   );
@@ -319,6 +341,54 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_800ExtraBold',
     color: COLORS.text,
     letterSpacing: -0.3,
+  },
+  centerState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  permissionContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    gap: 16,
+  },
+  permissionEmoji: {
+    fontSize: 56,
+  },
+  permissionTitle: {
+    fontSize: 22,
+    fontFamily: 'Nunito_800ExtraBold',
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  permissionSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Nunito_400Regular',
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  permissionButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    marginTop: 8,
+  },
+  permissionButtonText: {
+    fontSize: 15,
+    fontFamily: 'Nunito_700Bold',
+    color: '#000',
+  },
+  permissionHint: {
+    fontSize: 12,
+    fontFamily: 'Nunito_400Regular',
+    color: COLORS.textTertiary,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginTop: 4,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -387,39 +457,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_800ExtraBold',
     color: COLORS.text,
   },
-  customHeader: {
+  loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 20,
   },
-  addButton: {
-    flexDirection: 'row',
+  loadingText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_400Regular',
+    color: COLORS.textSecondary,
+  },
+  emptyState: {
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: COLORS.primaryMuted,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: COLORS.primary + '30',
-  },
-  addButtonText: {
-    fontSize: 13,
-    fontFamily: 'Nunito_700Bold',
-    color: COLORS.primary,
-  },
-  emptyCustom: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    gap: 8,
+    paddingVertical: 32,
+    gap: 10,
     backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderCurve: 'continuous',
-  },
-  emptyEmoji: {
-    fontSize: 32,
   },
   emptyTitle: {
     fontSize: 15,
@@ -476,15 +534,20 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_400Regular',
     color: COLORS.textTertiary,
   },
-  trackCustomLabel: {
-    fontSize: 11,
-    fontFamily: 'Nunito_600SemiBold',
-    color: COLORS.accent,
-  },
-  deleteBtn: {
-    width: 44,
-    height: 44,
+  loadMoreButton: {
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: COLORS.surfaceSecondary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderCurve: 'continuous',
+    minHeight: 48,
+  },
+  loadMoreText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+    color: COLORS.primary,
   },
 });

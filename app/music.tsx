@@ -1,15 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   Animated,
-  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as DocumentPicker from 'expo-document-picker';
+import * as MediaLibrary from 'expo-media-library';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
@@ -19,31 +19,32 @@ import {
   Pause,
   SkipBack,
   SkipForward,
-  Plus,
-  Trash2,
   Music2,
+  Music,
 } from 'lucide-react-native';
 
-export default function MusicScreen() {
+export default function MusicModalScreen() {
   const insets = useSafeAreaInsets();
   const {
     currentTrack,
     isPlaying,
-    tracks,
-    customTracks,
+    deviceTracks,
     play,
     pause,
     resume,
     next,
     previous,
-    addCustomTrack,
-    removeCustomTrack,
+    loadMoreTracks,
+    hasMoreTracks,
+    isLoadingTracks,
+    permissionStatus,
+    requestPermission,
   } = useMusic();
 
   const headerOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    console.log('[MusicScreen] mounted');
+    console.log('[MusicModalScreen] mounted');
     Animated.timing(headerOpacity, {
       toValue: 1,
       duration: 400,
@@ -51,26 +52,8 @@ export default function MusicScreen() {
     }).start();
   }, []);
 
-  const handlePickDocument = async () => {
-    console.log('[MusicScreen] pick document pressed');
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: 'audio/*',
-        copyToCacheDirectory: true,
-      });
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        const name = asset.name.replace(/\.[^/.]+$/, '');
-        console.log(`[MusicScreen] document picked: name=${name}, uri=${asset.uri}`);
-        addCustomTrack(asset.uri, name);
-      }
-    } catch (err) {
-      console.log('[MusicScreen] document picker error:', err);
-    }
-  };
-
   const handlePlayPause = (track: Track) => {
-    console.log(`[MusicScreen] play/pause: track=${track.name}, currentTrack=${currentTrack?.id}, isPlaying=${isPlaying}`);
+    console.log(`[MusicModalScreen] play/pause: track=${track.name}, currentTrack=${currentTrack?.id}, isPlaying=${isPlaying}`);
     if (currentTrack?.id === track.id) {
       if (isPlaying) {
         pause();
@@ -83,21 +66,26 @@ export default function MusicScreen() {
   };
 
   const handleNext = () => {
-    console.log('[MusicScreen] next pressed');
+    console.log('[MusicModalScreen] next pressed');
     next();
   };
 
   const handlePrevious = () => {
-    console.log('[MusicScreen] previous pressed');
+    console.log('[MusicModalScreen] previous pressed');
     previous();
   };
 
-  const handleRemoveTrack = (id: string) => {
-    console.log(`[MusicScreen] remove track: id=${id}`);
-    removeCustomTrack(id);
+  const handleRequestPermission = async () => {
+    console.log('[MusicModalScreen] request permission button pressed');
+    await requestPermission();
   };
 
-  const allTracks = [...tracks, ...customTracks];
+  const handleLoadMore = () => {
+    console.log('[MusicModalScreen] load more pressed');
+    loadMoreTracks();
+  };
+
+  const isGranted = permissionStatus === MediaLibrary.PermissionStatus.GRANTED;
 
   return (
     <CosmicBackground style={styles.container}>
@@ -114,120 +102,150 @@ export default function MusicScreen() {
         }}
       />
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 24 },
-        ]}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Title */}
-        <Animated.View style={[styles.titleSection, { opacity: headerOpacity }]}>
-          <Text style={styles.titleEmoji}>🎵</Text>
-          <Text style={styles.title}>Космическая музыка</Text>
-        </Animated.View>
+      {/* Permission not yet determined */}
+      {permissionStatus === null && (
+        <View style={[styles.centerState, { paddingTop: insets.top + 60 }]}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      )}
 
-        {/* Current track player */}
-        {currentTrack && (
-          <View style={styles.playerCard}>
-            <View style={styles.playerTrackInfo}>
-              <View style={styles.playerIconContainer}>
-                <Music2 size={20} color={COLORS.primary} />
-              </View>
-              <View style={styles.playerTextContainer}>
-                <Text style={styles.playerTrackName} numberOfLines={1}>
-                  {currentTrack.name}
-                </Text>
-                <Text style={styles.playerStatus}>
-                  {isPlaying ? 'Воспроизводится' : 'Пауза'}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.playerControls}>
-              <AnimatedPressable
-                onPress={handlePrevious}
-                style={styles.playerControlBtn}
-                accessibilityLabel="Предыдущий трек"
-                accessibilityRole="button"
-              >
-                <SkipBack size={22} color={COLORS.text} />
-              </AnimatedPressable>
-
-              <AnimatedPressable
-                onPress={() => handlePlayPause(currentTrack)}
-                style={styles.playerMainBtn}
-                accessibilityLabel={isPlaying ? 'Пауза' : 'Воспроизвести'}
-                accessibilityRole="button"
-              >
-                {isPlaying ? (
-                  <Pause size={26} color="#000" />
-                ) : (
-                  <Play size={26} color="#000" />
-                )}
-              </AnimatedPressable>
-
-              <AnimatedPressable
-                onPress={handleNext}
-                style={styles.playerControlBtn}
-                accessibilityLabel="Следующий трек"
-                accessibilityRole="button"
-              >
-                <SkipForward size={22} color={COLORS.text} />
-              </AnimatedPressable>
-            </View>
-          </View>
-        )}
-
-        {/* Preset tracks */}
-        <Text style={styles.sectionTitle}>Встроенные треки</Text>
-        {tracks.map((track, index) => (
-          <TrackRow
-            key={track.id}
-            track={track}
-            isActive={currentTrack?.id === track.id}
-            isPlaying={isPlaying && currentTrack?.id === track.id}
-            onPlayPause={() => handlePlayPause(track)}
-            index={index}
-          />
-        ))}
-
-        {/* Custom tracks */}
-        <View style={styles.customHeader}>
-          <Text style={styles.sectionTitle}>Моя музыка</Text>
+      {/* Permission denied */}
+      {permissionStatus !== null && !isGranted && (
+        <View style={[styles.permissionContainer, { paddingTop: insets.top + 60 }]}>
+          <Text style={styles.permissionEmoji}>🎵</Text>
+          <Text style={styles.permissionTitle}>Доступ к музыке</Text>
+          <Text style={styles.permissionSubtitle}>
+            Разреши доступ к медиатеке, чтобы слушать свою музыку во время тренировок
+          </Text>
           <AnimatedPressable
-            onPress={handlePickDocument}
-            style={styles.addButton}
-            accessibilityLabel="Добавить свою музыку"
+            onPress={handleRequestPermission}
+            style={styles.permissionButton}
+            accessibilityLabel="Разрешить доступ к музыке"
             accessibilityRole="button"
           >
-            <Plus size={18} color={COLORS.primary} />
-            <Text style={styles.addButtonText}>Добавить</Text>
+            <Text style={styles.permissionButtonText}>Разрешить доступ к музыке</Text>
           </AnimatedPressable>
         </View>
+      )}
 
-        {customTracks.length === 0 ? (
-          <View style={styles.emptyCustom}>
-            <Text style={styles.emptyEmoji}>🎵</Text>
-            <Text style={styles.emptyTitle}>Нет своей музыки</Text>
-            <Text style={styles.emptySubtitle}>
-              Нажми "Добавить" чтобы загрузить свои аудиофайлы
-            </Text>
-          </View>
-        ) : (
-          customTracks.map((track, index) => (
+      {/* Main content */}
+      {isGranted && (
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 24 },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Title */}
+          <Animated.View style={[styles.titleSection, { opacity: headerOpacity }]}>
+            <Text style={styles.titleEmoji}>🎵</Text>
+            <Text style={styles.title}>Космическая музыка</Text>
+          </Animated.View>
+
+          {/* Current track player */}
+          {currentTrack && (
+            <View style={styles.playerCard}>
+              <View style={styles.playerTrackInfo}>
+                <View style={styles.playerIconContainer}>
+                  <Music2 size={20} color={COLORS.primary} />
+                </View>
+                <View style={styles.playerTextContainer}>
+                  <Text style={styles.playerTrackName} numberOfLines={1}>
+                    {currentTrack.name}
+                  </Text>
+                  <Text style={styles.playerStatus}>
+                    {isPlaying ? 'Воспроизводится' : 'Пауза'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.playerControls}>
+                <AnimatedPressable
+                  onPress={handlePrevious}
+                  style={styles.playerControlBtn}
+                  accessibilityLabel="Предыдущий трек"
+                  accessibilityRole="button"
+                >
+                  <SkipBack size={22} color={COLORS.text} />
+                </AnimatedPressable>
+
+                <AnimatedPressable
+                  onPress={() => handlePlayPause(currentTrack)}
+                  style={styles.playerMainBtn}
+                  accessibilityLabel={isPlaying ? 'Пауза' : 'Воспроизвести'}
+                  accessibilityRole="button"
+                >
+                  {isPlaying ? (
+                    <Pause size={26} color="#000" />
+                  ) : (
+                    <Play size={26} color="#000" />
+                  )}
+                </AnimatedPressable>
+
+                <AnimatedPressable
+                  onPress={handleNext}
+                  style={styles.playerControlBtn}
+                  accessibilityLabel="Следующий трек"
+                  accessibilityRole="button"
+                >
+                  <SkipForward size={22} color={COLORS.text} />
+                </AnimatedPressable>
+              </View>
+            </View>
+          )}
+
+          {/* Device tracks section */}
+          <Text style={styles.sectionTitle}>Музыка с устройства</Text>
+
+          {/* Loading state */}
+          {isLoadingTracks && deviceTracks.length === 0 && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={COLORS.primary} />
+              <Text style={styles.loadingText}>Загрузка треков...</Text>
+            </View>
+          )}
+
+          {/* Empty state */}
+          {!isLoadingTracks && deviceTracks.length === 0 && (
+            <View style={styles.emptyState}>
+              <Music size={40} color={COLORS.textTertiary} />
+              <Text style={styles.emptyTitle}>Аудиофайлы не найдены</Text>
+              <Text style={styles.emptySubtitle}>
+                На устройстве не найдено аудиофайлов
+              </Text>
+            </View>
+          )}
+
+          {/* Track list */}
+          {deviceTracks.map((track, index) => (
             <TrackRow
               key={track.id}
               track={track}
               isActive={currentTrack?.id === track.id}
               isPlaying={isPlaying && currentTrack?.id === track.id}
               onPlayPause={() => handlePlayPause(track)}
-              onDelete={() => handleRemoveTrack(track.id)}
               index={index}
             />
-          ))
-        )}
-      </ScrollView>
+          ))}
+
+          {/* Load more */}
+          {hasMoreTracks && (
+            <AnimatedPressable
+              onPress={handleLoadMore}
+              style={styles.loadMoreButton}
+              accessibilityLabel="Загрузить ещё треки"
+              accessibilityRole="button"
+            >
+              {isLoadingTracks ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Text style={styles.loadMoreText}>Загрузить ещё</Text>
+              )}
+            </AnimatedPressable>
+          )}
+        </ScrollView>
+      )}
     </CosmicBackground>
   );
 }
@@ -237,14 +255,12 @@ function TrackRow({
   isActive,
   isPlaying,
   onPlayPause,
-  onDelete,
   index,
 }: {
   track: Track;
   isActive: boolean;
   isPlaying: boolean;
   onPlayPause: () => void;
-  onDelete?: () => void;
   index: number;
 }) {
   const opacity = useRef(new Animated.Value(0)).current;
@@ -255,13 +271,13 @@ function TrackRow({
       Animated.timing(opacity, {
         toValue: 1,
         duration: 300,
-        delay: index * 50,
+        delay: Math.min(index, 20) * 40,
         useNativeDriver: true,
       }),
       Animated.timing(translateX, {
         toValue: 0,
         duration: 300,
-        delay: index * 50,
+        delay: Math.min(index, 20) * 40,
         useNativeDriver: true,
       }),
     ]).start();
@@ -300,21 +316,7 @@ function TrackRow({
           {track.duration && (
             <Text style={styles.trackDuration}>{track.duration}</Text>
           )}
-          {!track.isPreset && (
-            <Text style={styles.trackCustomLabel}>Своя музыка</Text>
-          )}
         </View>
-
-        {onDelete && (
-          <AnimatedPressable
-            onPress={onDelete}
-            style={styles.deleteBtn}
-            accessibilityLabel={`Удалить ${track.name}`}
-            accessibilityRole="button"
-          >
-            <Trash2 size={18} color={COLORS.danger} />
-          </AnimatedPressable>
-        )}
       </View>
     </Animated.View>
   );
@@ -323,6 +325,46 @@ function TrackRow({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centerState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  permissionContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    gap: 16,
+  },
+  permissionEmoji: {
+    fontSize: 56,
+  },
+  permissionTitle: {
+    fontSize: 22,
+    fontFamily: 'Nunito_800ExtraBold',
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  permissionSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Nunito_400Regular',
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  permissionButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    marginTop: 8,
+  },
+  permissionButtonText: {
+    fontSize: 15,
+    fontFamily: 'Nunito_700Bold',
+    color: '#000',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -404,39 +446,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_800ExtraBold',
     color: COLORS.text,
   },
-  customHeader: {
+  loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 20,
   },
-  addButton: {
-    flexDirection: 'row',
+  loadingText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_400Regular',
+    color: COLORS.textSecondary,
+  },
+  emptyState: {
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: COLORS.primaryMuted,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: COLORS.primary + '30',
-  },
-  addButtonText: {
-    fontSize: 13,
-    fontFamily: 'Nunito_700Bold',
-    color: COLORS.primary,
-  },
-  emptyCustom: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    gap: 8,
+    paddingVertical: 32,
+    gap: 10,
     backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderCurve: 'continuous',
-  },
-  emptyEmoji: {
-    fontSize: 32,
   },
   emptyTitle: {
     fontSize: 15,
@@ -493,15 +523,20 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_400Regular',
     color: COLORS.textTertiary,
   },
-  trackCustomLabel: {
-    fontSize: 11,
-    fontFamily: 'Nunito_600SemiBold',
-    color: COLORS.accent,
-  },
-  deleteBtn: {
-    width: 44,
-    height: 44,
+  loadMoreButton: {
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: COLORS.surfaceSecondary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderCurve: 'continuous',
+    minHeight: 48,
+  },
+  loadMoreText: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+    color: COLORS.primary,
   },
 });
