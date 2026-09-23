@@ -84,7 +84,7 @@ export function PlanetCard({
             <View style={styles.emojiContainer}>
               {planet.imageUrl && !imageError ? (
                 <Image
-                  source={{ uri: planet.imageUrl }}
+                  source={{ uri: planet.imageUrl, headers: { 'User-Agent': 'Mozilla/5.0' } }}
                   style={styles.planetImage}
                   resizeMode="cover"
                   onError={() => {

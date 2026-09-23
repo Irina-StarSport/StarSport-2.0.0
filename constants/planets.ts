@@ -33,7 +33,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(76,175,80,0.4)',
     starsReward: 2,
     unlockAfter: undefined,
-    imageUrl: 'https://picsum.photos/seed/earth/200/200',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/The_Blue_Marble_%28remastered%29.jpg/600px-The_Blue_Marble_%28remastered%29.jpg',
     exercises: [
       {
         id: 'earth-1',
@@ -196,7 +196,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,140,66,0.4)',
     starsReward: 1,
     unlockAfter: 'earth',
-    imageUrl: 'https://picsum.photos/seed/venus/200/200',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Venus-real_color.jpg/600px-Venus-real_color.jpg',
     exercises: [
       {
         id: 'venus-1',
@@ -357,7 +357,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,87,34,0.4)',
     starsReward: 2,
     unlockAfter: 'venus',
-    imageUrl: 'https://picsum.photos/seed/mars/200/200',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/600px-OSIRIS_Mars_true_color.jpg',
     exercises: [
       {
         id: 'mars-1',
@@ -520,7 +520,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,152,0,0.4)',
     starsReward: 3,
     unlockAfter: 'mars',
-    imageUrl: 'https://picsum.photos/seed/jupiter/200/200',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/600px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg',
     exercises: [
       {
         id: 'jupiter-1',
@@ -683,7 +683,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(33,150,243,0.4)',
     starsReward: 3,
     unlockAfter: 'jupiter',
-    imageUrl: 'https://picsum.photos/seed/neptune/200/200',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Neptune_Voyager2_color_calibrated.png/600px-Neptune_Voyager2_color_calibrated.png',
     exercises: [
       {
         id: 'neptune-1',
