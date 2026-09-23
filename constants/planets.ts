@@ -33,7 +33,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(76,175,80,0.4)',
     starsReward: 2,
     unlockAfter: undefined,
-    imageUrl: 'https://images-assets.nasa.gov/image/as17-148-22727/as17-148-22727~orig.jpg',
+    imageUrl: 'https://picsum.photos/seed/earth/200/200',
     exercises: [
       {
         id: 'earth-1',
@@ -196,7 +196,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,140,66,0.4)',
     starsReward: 1,
     unlockAfter: 'earth',
-    imageUrl: 'https://images-assets.nasa.gov/image/PIA00271/PIA00271~orig.jpg',
+    imageUrl: 'https://picsum.photos/seed/venus/200/200',
     exercises: [
       {
         id: 'venus-1',
@@ -357,7 +357,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,87,34,0.4)',
     starsReward: 2,
     unlockAfter: 'venus',
-    imageUrl: 'https://images-assets.nasa.gov/image/PIA02653/PIA02653~orig.jpg',
+    imageUrl: 'https://picsum.photos/seed/mars/200/200',
     exercises: [
       {
         id: 'mars-1',
@@ -520,7 +520,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,152,0,0.4)',
     starsReward: 3,
     unlockAfter: 'mars',
-    imageUrl: 'https://images-assets.nasa.gov/image/PIA21775/PIA21775~orig.jpg',
+    imageUrl: 'https://picsum.photos/seed/jupiter/200/200',
     exercises: [
       {
         id: 'jupiter-1',
@@ -683,7 +683,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(33,150,243,0.4)',
     starsReward: 3,
     unlockAfter: 'jupiter',
-    imageUrl: 'https://images-assets.nasa.gov/image/PIA01492/PIA01492~orig.jpg',
+    imageUrl: 'https://picsum.photos/seed/neptune/200/200',
     exercises: [
       {
         id: 'neptune-1',
