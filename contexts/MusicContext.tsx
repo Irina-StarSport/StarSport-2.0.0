@@ -21,35 +21,35 @@ const PRESET_TRACKS: Track[] = [
   {
     id: 'preset-1',
     name: 'Космическое путешествие',
-    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    uri: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dhalius/01_Dhalius_-_Chill_Mood.mp3',
     isPreset: true,
     duration: '3:45',
   },
   {
     id: 'preset-2',
     name: 'Звёздный марш',
-    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    uri: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dhalius/02_Dhalius_-_Dreamy.mp3',
     isPreset: true,
     duration: '2:30',
   },
   {
     id: 'preset-3',
     name: 'Лунная соната',
-    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    uri: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dhalius/03_Dhalius_-_Floating.mp3',
     isPreset: true,
     duration: '4:10',
   },
   {
     id: 'preset-4',
     name: 'Марсианский ритм',
-    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    uri: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dhalius/04_Dhalius_-_Happy_Go_Lucky.mp3',
     isPreset: true,
     duration: '3:00',
   },
   {
     id: 'preset-5',
     name: 'Нептунские волны',
-    uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+    uri: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dhalius/05_Dhalius_-_Inspiring.mp3',
     isPreset: true,
     duration: '5:20',
   },
@@ -95,6 +95,7 @@ function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
     if (isPlaying) {
       console.log('[AudioEngine] calling player.play()');
       player.play();
+      player.loop = true;
     } else {
       console.log('[AudioEngine] calling player.pause()');
       player.pause();
@@ -107,6 +108,7 @@ function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
     console.log('[AudioEngine] track changed, auto-playing:', uri);
     if (isPlaying) {
       player.play();
+      player.loop = true;
     }
     return () => {
       console.log('[AudioEngine] uri cleanup — pausing old player');

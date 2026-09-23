@@ -29,8 +29,10 @@
       "versionCode": 10,
       "permissions": [
         "android.permission.READ_MEDIA_AUDIO",
-        "android.permission.READ_EXTERNAL_STORAGE"
-      ]
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.INTERNET"
+      ],
+      "usesCleartextTraffic": false
     },
     "web": {
       "favicon": "./assets/images/newly.png",
