@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Animated,
   Image,
+  ImageSourcePropType,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,7 +31,6 @@ export default function PlanetScreen() {
 
   const heroOpacity = useRef(new Animated.Value(0)).current;
   const heroScale = useRef(new Animated.Value(0.8)).current;
-  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     console.log(`[PlanetScreen] mounted: planet=${id}`);
@@ -111,16 +111,11 @@ export default function PlanetScreen() {
                   },
                 ]}
               >
-                {planet.imageUrl && !imageError ? (
+                {planet.image ? (
                   <Image
-                    source={{ uri: planet.imageUrl }}
+                    source={planet.image as ImageSourcePropType}
                     style={{ width: 100, height: 100, borderRadius: 50 }}
                     resizeMode="cover"
-                    onError={() => {
-                      console.log(`[PlanetScreen] image load error for planet ${planet.id}, falling back to emoji`);
-                      setImageError(true);
-                    }}
-                    onLoad={() => console.log(`[PlanetScreen] image loaded for planet ${planet.id}`)}
                   />
                 ) : (
                   <Text style={styles.planetEmoji}>{planet.emoji}</Text>

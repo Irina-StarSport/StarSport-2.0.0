@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, Image } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, Image, ImageSourcePropType } from 'react-native';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
 import { COLORS } from '@/constants/SpaceColors';
 import { Planet } from '@/constants/planets';
@@ -14,6 +14,11 @@ interface PlanetCardProps {
   index: number;
 }
 
+function resolveImageSource(source: ReturnType<typeof require> | undefined): ImageSourcePropType {
+  if (!source) return { uri: '' };
+  return source as ImageSourcePropType;
+}
+
 export function PlanetCard({
   planet,
   completedCount,
@@ -24,7 +29,6 @@ export function PlanetCard({
 }: PlanetCardProps) {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
-  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -80,18 +84,13 @@ export function PlanetCard({
           />
 
           <View style={styles.row}>
-            {/* Planet emoji / image */}
+            {/* Planet image or emoji */}
             <View style={styles.emojiContainer}>
-              {planet.imageUrl && !imageError ? (
+              {planet.image ? (
                 <Image
-                  source={{ uri: planet.imageUrl, headers: { 'User-Agent': 'Mozilla/5.0' } }}
+                  source={resolveImageSource(planet.image)}
                   style={styles.planetImage}
                   resizeMode="cover"
-                  onError={() => {
-                    console.log(`[PlanetCard] image load error for planet ${planet.id}, falling back to emoji`);
-                    setImageError(true);
-                  }}
-                  onLoad={() => console.log(`[PlanetCard] image loaded for planet ${planet.id}`)}
                 />
               ) : (
                 <Text style={styles.emoji}>{planet.emoji}</Text>
