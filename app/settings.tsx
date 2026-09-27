@@ -14,7 +14,8 @@ import { COLORS } from '@/constants/SpaceColors';
 import { useProgress } from '@/contexts/ProgressContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { ChevronLeft, Type, Globe, RotateCcw, Volume2 } from 'lucide-react-native';
+import { ChevronLeft, Type, Globe, RotateCcw, Volume2, Music } from 'lucide-react-native';
+import * as MediaLibrary from 'expo-media-library';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -57,6 +58,28 @@ export default function SettingsScreen() {
 
   const volumeSteps = [0, 0.25, 0.5, 0.75, 1.0];
   const volumeLabels = ['0%', '25%', '50%', '75%', '100%'];
+
+  const handleOpenMediaLibrary = async () => {
+    console.log('[SettingsScreen] open media library pressed');
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('[SettingsScreen] media library permission denied');
+      Alert.alert(
+        'Нет доступа',
+        'Для доступа к музыке разрешите доступ к медиатеке в настройках устройства.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+    console.log('[SettingsScreen] media library permission granted, fetching audio assets');
+    const result = await MediaLibrary.getAssetsAsync({ mediaType: 'audio' });
+    console.log(`[SettingsScreen] found ${result.totalCount} audio tracks`);
+    Alert.alert(
+      'Моя музыка',
+      `Найдено треков: ${result.totalCount}`,
+      [{ text: 'OK' }]
+    );
+  };
 
   return (
     <CosmicBackground style={styles.container}>
@@ -152,6 +175,25 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* My Music */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Music size={18} color={COLORS.accent} />
+            <Text style={styles.sectionTitle}>Моя музыка</Text>
+          </View>
+          <Text style={styles.sectionHint}>
+            Добавьте свои треки для воспроизведения во время тренировок
+          </Text>
+          <TouchableOpacity
+            style={styles.mediaButton}
+            onPress={handleOpenMediaLibrary}
+            activeOpacity={0.75}
+          >
+            <Music size={16} color="#fff" />
+            <Text style={styles.mediaButtonText}>Открыть медиатеку устройства</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Language */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -206,7 +248,7 @@ export default function SettingsScreen() {
         {/* App info */}
         <View style={styles.appInfo}>
           <Text style={styles.appInfoText}>StarSport: Планета Здоровья</Text>
-          <Text style={styles.appInfoVersion}>Версия 1.0.0</Text>
+          <Text style={styles.appInfoVersion}>Версия 2.0.3</Text>
         </View>
       </ScrollView>
     </CosmicBackground>
@@ -310,6 +352,20 @@ const styles = StyleSheet.create({
   },
   optionFlag: {
     fontSize: 16,
+  },
+  mediaButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#2196F3',
+    borderRadius: 12,
+    paddingVertical: 14,
+  },
+  mediaButtonText: {
+    fontSize: 15,
+    fontFamily: 'Nunito_700Bold',
+    color: '#fff',
   },
   resetButton: {
     flexDirection: 'row',

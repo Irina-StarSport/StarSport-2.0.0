@@ -30,6 +30,15 @@ const DevErrorBoundary = __DEV__
   ? ErrorBoundary
   : ({ children }: { children: React.ReactNode }) => <>{children}</>;
 
+// Global unhandled promise rejection handler
+if (typeof global !== 'undefined') {
+  const originalHandler = (global as typeof global & { onunhandledrejection?: (event: { reason: unknown }) => void }).onunhandledrejection;
+  (global as typeof global & { onunhandledrejection?: (event: { reason: unknown }) => void }).onunhandledrejection = (event: { reason: unknown }) => {
+    console.error('[GlobalHandler] Unhandled promise rejection:', event?.reason);
+    if (originalHandler) originalHandler(event);
+  };
+}
+
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
@@ -68,6 +77,7 @@ export default function RootLayout() {
   }
 
   return (
+    <ErrorBoundary>
     <DevErrorBoundary>
       <StatusBar style="light" animated />
       <ThemeProvider value={SpaceTheme}>
@@ -145,5 +155,6 @@ export default function RootLayout() {
         </SafeAreaProvider>
       </ThemeProvider>
     </DevErrorBoundary>
+    </ErrorBoundary>
   );
 }

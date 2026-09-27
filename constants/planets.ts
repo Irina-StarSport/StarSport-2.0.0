@@ -204,7 +204,6 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,140,66,0.4)',
     starsReward: 1,
     unlockAfter: 'earth',
-    image: planetImages.venus,
     exercises: [
       {
         id: 'venus-1',
@@ -359,13 +358,12 @@ export const PLANETS: Planet[] = [
   {
     id: 'mars',
     name: 'Марс',
-    emoji: '🔴',
+    emoji: '🚀',
     subtitle: 'Ловкость',
     color: '#FF5722',
     glowColor: 'rgba(255,87,34,0.4)',
     starsReward: 2,
     unlockAfter: 'venus',
-    image: planetImages.mars,
     exercises: [
       {
         id: 'mars-1',
