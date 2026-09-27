@@ -168,13 +168,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'flex-start',
+    gap: 12,
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
   headerLeft: {
     gap: 2,
-    flexShrink: 1,
   },
   titleRow: {
     flexDirection: 'row',
