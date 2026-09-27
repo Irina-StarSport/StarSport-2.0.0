@@ -13,7 +13,7 @@ import { COLORS } from '@/constants/SpaceColors';
 import { useProgress } from '@/contexts/ProgressContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { Type, Globe, RotateCcw, Volume2 } from 'lucide-react-native';
+import { Type, Globe, RotateCcw, Volume2, Music } from 'lucide-react-native';
 import { t } from '@/constants/translations';
 
 export default function SettingsScreen() {
@@ -149,6 +149,28 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* My Music */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Music size={18} color={COLORS.accent} />
+            <Text style={styles.sectionTitle}>Моя музыка 🎵</Text>
+          </View>
+          <Text style={sectionHintStyle}>
+            Добавьте свои треки с устройства для воспроизведения во время тренировок
+          </Text>
+          <TouchableOpacity
+            style={styles.musicButton}
+            onPress={() => {
+              console.log('[SettingsScreen] open media library pressed');
+              Alert.alert('Медиатека', 'Перейдите в раздел Музыка в нижней панели для выбора треков с устройства');
+            }}
+            activeOpacity={0.75}
+          >
+            <Music size={16} color="#fff" />
+            <Text style={styles.resetButtonText}>Открыть медиатеку устройства</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Language */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -210,7 +232,7 @@ export default function SettingsScreen() {
         {/* App info */}
         <View style={styles.appInfo}>
           <Text style={styles.appInfoText}>StarSport: Планета Здоровья</Text>
-          <Text style={styles.appInfoVersion}>Версия 2.0.2</Text>
+          <Text style={styles.appInfoVersion}>Версия 2.0.3</Text>
         </View>
       </ScrollView>
     </CosmicBackground>
@@ -334,6 +356,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Nunito_700Bold',
     color: '#fff',
+  },
+  musicButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.accent,
+    borderRadius: 12,
+    paddingVertical: 14,
   },
   appInfo: {
     alignItems: 'center',

@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     gap: 2,
+    flexShrink: 1,
   },
   titleRow: {
     flexDirection: 'row',
@@ -201,20 +202,22 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+    flexShrink: 0,
+    flexWrap: 'nowrap',
   },
   starsButton: {
     backgroundColor: COLORS.primaryMuted,
     borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderWidth: 1,
     borderColor: COLORS.primary + '30',
   },
   iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: COLORS.surfaceSecondary,
     alignItems: 'center',
     justifyContent: 'center',
