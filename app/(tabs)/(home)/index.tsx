@@ -168,13 +168,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    justifyContent: 'flex-start',
+    gap: 12,
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
   headerLeft: {
     gap: 2,
-    flexShrink: 1,
   },
   titleRow: {
     flexDirection: 'row',
@@ -202,9 +202,9 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginLeft: 'auto',
-    paddingRight: 4,
+    gap: 6,
+    flexShrink: 0,
+    flexWrap: 'nowrap',
   },
   starsButton: {
     backgroundColor: COLORS.primaryMuted,

@@ -1,6 +1,5 @@
 const planetImages = {
   earth: require('../assets/images/planets/earth.jpg'),
-  venus: require('../assets/images/planets/venus.jpg'),
   jupiter: require('../assets/images/planets/jupiter.jpg'),
   neptune: require('../assets/images/planets/neptune.jpg'),
 };
@@ -203,7 +202,6 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,140,66,0.4)',
     starsReward: 1,
     unlockAfter: 'earth',
-    image: planetImages.venus,
     exercises: [
       {
         id: 'venus-1',
