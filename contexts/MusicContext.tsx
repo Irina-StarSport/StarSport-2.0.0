@@ -47,38 +47,76 @@ interface AudioEngineProps {
 }
 
 function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
-  const source = uri ? { uri } : null;
-  const player = useAudioPlayer(source);
+  // Always call with a static null so the hook argument never changes (Rules of Hooks).
+  // Use player.replace() to swap the audio source safely.
+  const player = useAudioPlayer(null);
 
+  // Track URI changes: pause → replace → play
   useEffect(() => {
-    if (!uri) return;
-    if (isPlaying) {
-      console.log('[AudioEngine] calling player.play()');
-      player.play();
-      player.loop = true;
-    } else {
-      console.log('[AudioEngine] calling player.pause()');
+    console.log('[AudioEngine] uri changed:', uri);
+    try {
       player.pause();
-    }
-  }, [isPlaying]);
-
-  useEffect(() => {
-    if (!uri) return;
-    console.log('[AudioEngine] track changed, auto-playing:', uri);
-    if (isPlaying) {
-      player.play();
-      player.loop = true;
+      if (uri) {
+        player.replace({ uri });
+        if (isPlaying) {
+          console.log('[AudioEngine] uri changed — calling player.play()');
+          player.play();
+          player.loop = true;
+        }
+      }
+    } catch (e) {
+      console.log('[AudioEngine] error on uri change:', e);
     }
     return () => {
-      console.log('[AudioEngine] uri cleanup — pausing old player');
-      player.pause();
+      try {
+        player.pause();
+      } catch (e) {
+        console.log('[AudioEngine] error on uri cleanup:', e);
+      }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uri]);
 
+  // isPlaying changes: play or pause
   useEffect(() => {
-    player.volume = volume;
-    console.log('[AudioEngine] volume set to', volume);
+    if (!uri) return;
+    try {
+      if (isPlaying) {
+        console.log('[AudioEngine] isPlaying=true — calling player.play()');
+        player.play();
+        player.loop = true;
+      } else {
+        console.log('[AudioEngine] isPlaying=false — calling player.pause()');
+        player.pause();
+      }
+    } catch (e) {
+      console.log('[AudioEngine] error on isPlaying change:', e);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying]);
+
+  // Volume sync
+  useEffect(() => {
+    try {
+      player.volume = volume;
+      console.log('[AudioEngine] volume set to', volume);
+    } catch (e) {
+      console.log('[AudioEngine] error setting volume:', e);
+    }
   }, [volume, player]);
+
+  // Unmount cleanup
+  useEffect(() => {
+    return () => {
+      try {
+        player.pause();
+        console.log('[AudioEngine] unmount — player paused');
+      } catch (e) {
+        console.log('[AudioEngine] error on unmount cleanup:', e);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return null;
 }
