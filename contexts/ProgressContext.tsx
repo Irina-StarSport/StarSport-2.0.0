@@ -62,19 +62,24 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     async function load() {
-      const [stars, progress, purchased, activeItems] = await Promise.all([
-        loadTotalStars(),
-        loadPlanetProgress(),
-        loadPurchasedItems(),
-        loadActiveItems(),
-      ]);
-      setTotalStars(stars);
-      setPlanetProgress(progress);
-      setPurchasedItems(purchased);
-      setActiveBackgroundState(activeItems.background);
-      setActiveFrameState(activeItems.frame);
-      setActiveStickersState(activeItems.stickers);
-      setIsLoaded(true);
+      try {
+        const [stars, progress, purchased, activeItems] = await Promise.all([
+          loadTotalStars(),
+          loadPlanetProgress(),
+          loadPurchasedItems(),
+          loadActiveItems(),
+        ]);
+        setTotalStars(typeof stars === 'number' && !isNaN(stars) ? stars : 0);
+        setPlanetProgress(progress && typeof progress === 'object' ? progress : {});
+        setPurchasedItems(Array.isArray(purchased) ? purchased : []);
+        setActiveBackgroundState(activeItems?.background ?? null);
+        setActiveFrameState(activeItems?.frame ?? null);
+        setActiveStickersState(Array.isArray(activeItems?.stickers) ? activeItems.stickers : []);
+      } catch (e) {
+        console.warn('[ProgressContext] load error, using defaults:', e);
+      } finally {
+        setIsLoaded(true);
+      }
     }
     load();
   }, []);

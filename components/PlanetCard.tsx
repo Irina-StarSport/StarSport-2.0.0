@@ -47,10 +47,10 @@ export function PlanetCard({
     ]).start();
   }, []);
 
-  const total = planet.exercises.length;
-  const progress = total > 0 ? completedCount / total : 0;
-  const progressPercent = Math.round(progress * 100);
-  const isFullyCompleted = completedCount >= total && total > 0;
+  const total = planet?.exercises?.length ?? 0;
+  const progress = total > 0 ? (completedCount ?? 0) / total : 0;
+  const progressPercent = Math.min(100, Math.round(progress * 100));
+  const isFullyCompleted = (completedCount ?? 0) >= total && total > 0;
 
   const completedText = `Пройдено: ${completedCount}/${total} упражнений`;
 
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0a0a2a',
+    backgroundColor: '#000',
     overflow: 'hidden',
   },
   emoji: {
@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
+    overflow: 'hidden',
   },
   info: {
     flex: 1,

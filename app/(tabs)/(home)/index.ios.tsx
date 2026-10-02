@@ -139,8 +139,8 @@ export default function HomeScreen() {
           {t(lang, 'choosePlanetSubtitle')}
         </Text>
 
-        {PLANETS.map((planet, index) => {
-          const completed = planetProgress[planet.id]?.completedExercises.length ?? 0;
+        {PLANETS.filter(Boolean).map((planet, index) => {
+          const completed = planetProgress[planet.id]?.completedExercises?.length ?? 0;
           const locked = !isPlanetUnlocked(planet.id);
           const stars = getPlanetStars(planet.id);
           return (

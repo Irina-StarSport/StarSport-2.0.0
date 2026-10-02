@@ -1,5 +1,7 @@
 const planetImages = {
   earth: require('../assets/images/planets/earth.jpg'),
+  venus: require('../assets/images/6604e28a-d41d-4574-8e85-c5d05a5fa9f9.jpeg'),
+  mars: require('../assets/images/8dbf06f0-417f-433a-93b4-73b21ddde23b.jpeg'),
   jupiter: require('../assets/images/planets/jupiter.jpg'),
   neptune: require('../assets/images/planets/neptune.jpg'),
 };
@@ -202,6 +204,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,140,66,0.4)',
     starsReward: 1,
     unlockAfter: 'earth',
+    image: planetImages.venus,
     exercises: [
       {
         id: 'venus-1',
@@ -362,6 +365,7 @@ export const PLANETS: Planet[] = [
     glowColor: 'rgba(255,87,34,0.4)',
     starsReward: 2,
     unlockAfter: 'venus',
+    image: planetImages.mars,
     exercises: [
       {
         id: 'mars-1',
