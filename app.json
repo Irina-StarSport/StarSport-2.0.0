@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "StarSport",
-    "slug": "starsport-health-planet-cqqnkt",
-    "version": "2.0.4",
+    "slug": "starsport",
+    "version": "2.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -28,7 +28,7 @@
         "backgroundColor": "#0a0a2e"
       },
       "package": "com.starsport.app",
-      "versionCode": 7,
+      "versionCode": 25,
       "permissions": [
         "android.permission.READ_MEDIA_AUDIO",
         "android.permission.READ_MEDIA_IMAGES",
