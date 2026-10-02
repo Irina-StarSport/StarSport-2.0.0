@@ -33,7 +33,7 @@ const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'venus-traveler',
     emoji: '🌸',
-    name: 'Венерианский путешественник',
+    name: 'Путешественник с Венеры',
     description: 'Пройди все упражнения на Венере',
     isUnlocked: (_, planets) => planets.includes('venus'),
   },
@@ -47,21 +47,21 @@ const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'mars-agile',
     emoji: '🔴',
-    name: 'Марсианский ловкач',
+    name: 'Марсианский трюкач',
     description: 'Пройди все упражнения на Марсе',
     isUnlocked: (_, planets) => planets.includes('mars'),
   },
   {
     id: 'jupiter-flex',
     emoji: '🌀',
-    name: 'Юпитерский гибкач',
+    name: 'Юпитерский Гимнаст',
     description: 'Пройди все упражнения на Юпитере',
     isUnlocked: (_, planets) => planets.includes('jupiter'),
   },
   {
     id: 'neptune-breather',
     emoji: '🌌',
-    name: 'Нептунский дышатель',
+    name: 'Нептунский мастер дыхания',
     description: 'Пройди все упражнения на Нептуне',
     isUnlocked: (_, planets) => planets.includes('neptune'),
   },
@@ -78,7 +78,7 @@ const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'star-collector',
     emoji: '⭐',
-    name: 'Звёздный коллектор',
+    name: 'Звёздный коллекционер',
     description: 'Заработай 50 звёзд',
     isUnlocked: (stars) => stars >= 50,
   },
