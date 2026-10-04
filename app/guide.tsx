@@ -90,7 +90,7 @@ export default function GuideScreen() {
         {/* Section 3 */}
         <GuideCard emoji="🌍" title="Планеты">
           {[
-            { emoji: '🌸', name: 'Венера', desc: 'Разминка — начало путешествия' },
+            { emoji: '🪐', name: 'Венера', desc: 'Разминка — начало путешествия' },
             { emoji: '🌍', name: 'Земля', desc: 'Сила — укрепляем мышцы' },
             { emoji: '🔴', name: 'Марс', desc: 'Ловкость — развиваем координацию' },
             { emoji: '🌀', name: 'Юпитер', desc: 'Гибкость — растягиваемся' },
@@ -110,7 +110,7 @@ export default function GuideScreen() {
         {/* Section 4 */}
         <GuideCard emoji="⭐" title="Система звёзд">
           {[
-            { planet: '🌸 Венера', stars: '1 звезда за упражнение' },
+            { planet: '🪐 Венера', stars: '1 звезда за упражнение' },
             { planet: '🌍 Земля и 🔴 Марс', stars: '2 звезды за упражнение' },
             { planet: '🌀 Юпитер и 🌌 Нептун', stars: '3 звезды за упражнение' },
             { planet: '🌟 Звёздный финал', stars: '5 звёзд за упражнение' },

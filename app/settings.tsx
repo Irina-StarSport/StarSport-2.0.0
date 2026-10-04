@@ -248,7 +248,7 @@ export default function SettingsScreen() {
         {/* App info */}
         <View style={styles.appInfo}>
           <Text style={styles.appInfoText}>StarSport: Планета Здоровья</Text>
-          <Text style={styles.appInfoVersion}>Версия 2.0.5</Text>
+          <Text style={styles.appInfoVersion}>Версия 2.0.6</Text>
         </View>
       </ScrollView>
     </CosmicBackground>
