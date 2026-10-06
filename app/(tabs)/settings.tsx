@@ -21,7 +21,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { totalStars, resetProgress } = useProgress();
   const { settings, updateTextSize, updateLanguage, textScale } = useSettings();
-  const { volume, setVolume, addDeviceTracks, deviceTracks, play, currentTrack } = useMusic();
+  const { volume, setVolume, addDeviceTracks, deviceTracks, play, pause, isPlaying, currentTrack } = useMusic();
 
   const handleResetProgress = () => {
     console.log('[SettingsScreen] reset progress pressed');
@@ -190,22 +190,49 @@ export default function SettingsScreen() {
               {deviceTracks.map((track) => {
                 const isActive = currentTrack?.id === track.id;
                 const trackNameStyle = isActive ? styles.trackNameActive : styles.trackName;
+                const showPause = isActive && isPlaying;
                 return (
-                  <TouchableOpacity
+                  <View
                     key={track.id}
                     style={[styles.trackRow, isActive && styles.trackRowActive]}
-                    onPress={() => {
-                      console.log(`[SettingsScreen] play track pressed: ${track.name}`);
-                      play(track);
-                    }}
-                    activeOpacity={0.75}
                   >
-                    <Text style={styles.trackNote}>🎵</Text>
-                    <Text style={[trackNameStyle, styles.trackNameFlex]} numberOfLines={1}>
-                      {track.name}
-                    </Text>
-                    <Text style={[styles.trackPlay, isActive && styles.trackPlayActive]}>▶</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.trackNameArea}
+                      onPress={() => {
+                        console.log(`[SettingsScreen] play track pressed: ${track.name}`);
+                        play(track);
+                      }}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={styles.trackNote}>🎵</Text>
+                      <Text style={[trackNameStyle, styles.trackNameFlex]} numberOfLines={1}>
+                        {track.name}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.trackControls}>
+                      {showPause ? (
+                        <TouchableOpacity
+                          onPress={() => {
+                            console.log(`[SettingsScreen] pause track pressed: ${track.name}`);
+                            pause();
+                          }}
+                          activeOpacity={0.75}
+                        >
+                          <Text style={[styles.trackPlay, styles.trackPlayActive]}>⏸</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => {
+                            console.log(`[SettingsScreen] play track pressed: ${track.name}`);
+                            play(track);
+                          }}
+                          activeOpacity={0.75}
+                        >
+                          <Text style={[styles.trackPlay, isActive && styles.trackPlayActive]}>▶</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
                 );
               })}
             </View>
@@ -441,6 +468,17 @@ const styles = StyleSheet.create({
   },
   trackNameFlex: {
     flex: 1,
+  },
+  trackNameArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 10,
+  },
+  trackControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   trackPlay: {
     fontSize: 12,
