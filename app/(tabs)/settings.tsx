@@ -21,7 +21,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { totalStars, resetProgress } = useProgress();
   const { settings, updateTextSize, updateLanguage, textScale } = useSettings();
-  const { volume, setVolume, addDeviceTracks } = useMusic();
+  const { volume, setVolume, addDeviceTracks, deviceTracks, play, currentTrack } = useMusic();
 
   const handleResetProgress = () => {
     console.log('[SettingsScreen] reset progress pressed');
@@ -172,11 +172,7 @@ export default function SettingsScreen() {
                 console.log('[SettingsScreen] DocumentPicker result:', result);
                 if (!result.canceled && result.assets && result.assets.length > 0) {
                   addDeviceTracks(result.assets);
-                  Alert.alert(
-                    '✅ Треки добавлены',
-                    `Добавлено ${result.assets.length} ${result.assets.length === 1 ? 'трек' : 'треков'}. Откройте раздел Музыка для воспроизведения.`,
-                    [{ text: 'OK' }]
-                  );
+                  console.log(`[SettingsScreen] added ${result.assets.length} track(s)`);
                 }
               } catch (err) {
                 console.log('[SettingsScreen] DocumentPicker error:', err);
@@ -188,6 +184,32 @@ export default function SettingsScreen() {
             <Music size={16} color="#fff" />
             <Text style={styles.resetButtonText}>Открыть медиатеку устройства</Text>
           </TouchableOpacity>
+
+          {deviceTracks.length > 0 && (
+            <View style={styles.trackList}>
+              {deviceTracks.map((track) => {
+                const isActive = currentTrack?.id === track.id;
+                const trackNameStyle = isActive ? styles.trackNameActive : styles.trackName;
+                return (
+                  <TouchableOpacity
+                    key={track.id}
+                    style={[styles.trackRow, isActive && styles.trackRowActive]}
+                    onPress={() => {
+                      console.log(`[SettingsScreen] play track pressed: ${track.name}`);
+                      play(track);
+                    }}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={styles.trackNote}>🎵</Text>
+                    <Text style={[trackNameStyle, styles.trackNameFlex]} numberOfLines={1}>
+                      {track.name}
+                    </Text>
+                    <Text style={[styles.trackPlay, isActive && styles.trackPlayActive]}>▶</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </View>
 
         {/* Language */}
@@ -384,6 +406,48 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.accent,
     borderRadius: 12,
     paddingVertical: 14,
+  },
+  trackList: {
+    gap: 4,
+    marginTop: 4,
+  },
+  trackRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: COLORS.surfaceSecondary,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  trackRowActive: {
+    borderColor: COLORS.accent,
+    backgroundColor: 'rgba(100,160,255,0.12)',
+  },
+  trackNote: {
+    fontSize: 14,
+  },
+  trackName: {
+    fontSize: 14,
+    fontFamily: 'Nunito_600SemiBold',
+    color: COLORS.text,
+  },
+  trackNameActive: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+    color: COLORS.accent,
+  },
+  trackNameFlex: {
+    flex: 1,
+  },
+  trackPlay: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  trackPlayActive: {
+    color: COLORS.accent,
   },
   appInfo: {
     alignItems: 'center',

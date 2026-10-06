@@ -102,7 +102,8 @@ export default function RootLayout() {
                     name="planet/[id]"
                     options={{
                       headerShown: true,
-                      headerTransparent: true,
+                      headerStyle: { backgroundColor: COLORS.background },
+                      headerShadowVisible: false,
                       headerTintColor: COLORS.text,
                     }}
                   />
@@ -110,7 +111,8 @@ export default function RootLayout() {
                     name="exercise/[planetId]/[exerciseId]"
                     options={{
                       headerShown: true,
-                      headerTransparent: true,
+                      headerStyle: { backgroundColor: COLORS.background },
+                      headerShadowVisible: false,
                       headerTintColor: COLORS.text,
                     }}
                   />

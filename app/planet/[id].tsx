@@ -76,9 +76,9 @@ export default function PlanetScreen() {
       <Stack.Screen
         options={{
           title: planet.name,
-          headerTransparent: true,
           headerTintColor: COLORS.text,
-          headerStyle: { backgroundColor: 'transparent' },
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
           headerTitleStyle: {
             fontFamily: 'Nunito_700Bold',
             color: COLORS.text,
@@ -91,7 +91,7 @@ export default function PlanetScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[
           styles.listContent,
-          { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 24 },
+          { paddingTop: 16, paddingBottom: insets.bottom + 24 },
         ]}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={

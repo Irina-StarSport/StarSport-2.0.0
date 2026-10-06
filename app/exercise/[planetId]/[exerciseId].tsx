@@ -173,8 +173,9 @@ export default function ExerciseScreen() {
       <Stack.Screen
         options={{
           title: exercise.name,
-          headerTransparent: true,
           headerTintColor: COLORS.text,
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
           headerTitleStyle: {
             fontFamily: 'Nunito_700Bold',
             color: COLORS.text,
@@ -185,7 +186,7 @@ export default function ExerciseScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 16 },
+          { paddingTop: 16, paddingBottom: insets.bottom + 16 },
         ]}
         showsVerticalScrollIndicator={false}
       >
