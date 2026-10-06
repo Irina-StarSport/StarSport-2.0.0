@@ -9,6 +9,7 @@ import React, {
 import { useAudioPlayer } from 'expo-audio';
 import * as MediaLibrary from 'expo-media-library';
 import * as DocumentPicker from 'expo-document-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Track {
   id: string;
@@ -39,6 +40,8 @@ interface MusicContextType {
 }
 
 const MusicContext = createContext<MusicContextType | null>(null);
+
+const DEVICE_TRACKS_KEY = 'starsport_device_tracks';
 
 // ─── AudioEngine ────────────────────────────────────────────────────────────
 
@@ -149,7 +152,10 @@ const PAGE_SIZE = 30;
 export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [deviceTracks, setDeviceTracks] = useState<Track[]>([]);
+  // MediaLibrary tracks — reloaded from system on each launch
+  const [mediaLibraryTracks, setMediaLibraryTracks] = useState<Track[]>([]);
+  // DocumentPicker tracks — persisted to AsyncStorage
+  const [pickerTracks, setPickerTracks] = useState<Track[]>([]);
   const [volume, setVolumeState] = useState(0.8);
   const [permissionStatus, setPermissionStatus] = useState<MediaLibrary.PermissionStatus | null>(null);
   const [isLoadingTracks, setIsLoadingTracks] = useState(false);
@@ -173,7 +179,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       });
       console.log(`[MusicContext] loaded ${result.assets.length} audio assets, hasNextPage=${result.hasNextPage}`);
       const newTracks = result.assets.map(assetToTrack);
-      setDeviceTracks((prev) => (after ? [...prev, ...newTracks] : newTracks));
+      setMediaLibraryTracks((prev) => (after ? [...prev, ...newTracks] : newTracks));
       setHasMoreTracks(result.hasNextPage);
       setEndCursor(result.hasNextPage ? result.endCursor : undefined);
     } catch (err) {
@@ -193,8 +199,23 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     }
   }, [loadTracks]);
 
+  // On startup: load persisted picker tracks, then check MediaLibrary permission
   useEffect(() => {
     (async () => {
+      // Load persisted DocumentPicker tracks
+      try {
+        const saved = await AsyncStorage.getItem(DEVICE_TRACKS_KEY);
+        if (saved) {
+          const parsed: Track[] = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            console.log(`[MusicContext] restored ${parsed.length} picker track(s) from AsyncStorage`);
+            setPickerTracks(parsed);
+          }
+        }
+      } catch (e) {
+        console.log('[MusicContext] failed to load saved tracks:', e);
+      }
+      // Existing permission check
       console.log('[MusicContext] checking existing permissions');
       const { status } = await MediaLibrary.getPermissionsAsync();
       console.log('[MusicContext] existing permission status:', status);
@@ -203,7 +224,15 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         await loadTracks();
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Persist pickerTracks to AsyncStorage whenever they change
+  useEffect(() => {
+    AsyncStorage.setItem(DEVICE_TRACKS_KEY, JSON.stringify(pickerTracks)).catch((e) => {
+      console.log('[MusicContext] failed to save tracks:', e);
+    });
+  }, [pickerTracks]);
 
   const addDeviceTracks = useCallback((assets: DocumentPicker.DocumentPickerAsset[]) => {
     console.log(`[MusicContext] addDeviceTracks called with ${assets.length} asset(s)`);
@@ -213,7 +242,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       uri: asset.uri,
       isPreset: false,
     }));
-    setDeviceTracks((prev) => {
+    setPickerTracks((prev) => {
       const existingUris = new Set(prev.map((t) => t.uri));
       const unique = newTracks.filter((t) => !existingUris.has(t.uri));
       console.log(`[MusicContext] addDeviceTracks: ${unique.length} new unique track(s) appended`);
@@ -228,7 +257,11 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     }
   }, [hasMoreTracks, endCursor, isLoadingTracks, loadTracks]);
 
-  const allTracks = useMemo(() => deviceTracks, [deviceTracks]);
+  // Combined list: picker tracks first, then MediaLibrary tracks
+  const allTracks = useMemo(
+    () => [...pickerTracks, ...mediaLibraryTracks],
+    [pickerTracks, mediaLibraryTracks],
+  );
 
   const play = useCallback((track: Track) => {
     console.log(`[MusicContext] play: track=${track.name}, uri=${track.uri}`);
@@ -277,8 +310,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       value={{
         currentTrack,
         isPlaying,
-        tracks: deviceTracks,
-        deviceTracks,
+        tracks: allTracks,
+        deviceTracks: allTracks,
         play,
         pause,
         resume,
