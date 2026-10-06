@@ -2,7 +2,7 @@ const planetImages = {
   earth: require('../assets/images/planets/earth.jpg'),
   venus: require('../assets/images/6604e28a-d41d-4574-8e85-c5d05a5fa9f9.jpeg'),
   mars: require('../assets/images/8dbf06f0-417f-433a-93b4-73b21ddde23b.jpeg'),
-  jupiter: require('../assets/images/planets/jupiter.jpg'),
+  jupiter: require('../assets/images/de4316d0-4d11-46b4-9d6d-a070a5d4e6db.jpeg'),
   neptune: require('../assets/images/planets/neptune.jpg'),
 };
 
