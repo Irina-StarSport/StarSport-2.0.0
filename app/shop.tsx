@@ -7,7 +7,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
@@ -17,7 +17,6 @@ import { SHOP_ITEMS, ShopItemCategory, ShopItem } from '@/constants/shopItems';
 import { useProgress } from '@/contexts/ProgressContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { t } from '@/constants/translations';
-import { ChevronLeft } from 'lucide-react-native';
 
 function chunkArray<T>(arr: T[], size: number): T[][] {
   const result: T[][] = [];
@@ -29,7 +28,6 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 
 export default function ShopScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const { totalStars, purchaseItem, isItemPurchased, purchasedItems } = useProgress();
   const { settings } = useSettings();
   const lang = settings.language;
@@ -149,31 +147,16 @@ export default function ShopScreen() {
 
   return (
     <CosmicBackground style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      {/* Custom header */}
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => {
-            console.log('[ShopScreen] back pressed');
-            router.back();
-          }}
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={24} color={COLORS.text} />
-          <Text style={styles.backText}>{t(lang, 'back')}</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t(lang, 'shopTitle')}</Text>
-        <View style={styles.headerRight}>
-          <StarCounter count={totalStars} size="small" />
-        </View>
-      </View>
+      <Stack.Screen
+        options={{
+          headerRight: () => <StarCounter count={totalStars} size="small" />,
+        }}
+      />
 
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + 24 },
+          { paddingTop: 16, paddingBottom: insets.bottom + 24 },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -226,36 +209,6 @@ export default function ShopScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    gap: 8,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 6,
-    paddingRight: 8,
-  },
-  backText: {
-    fontSize: 16,
-    fontFamily: 'Nunito_600SemiBold',
-    color: COLORS.text,
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontFamily: 'Nunito_800ExtraBold',
-    color: COLORS.text,
-    textAlign: 'center',
-  },
-  headerRight: {
-    minWidth: 60,
-    alignItems: 'flex-end',
-  },
   scrollContent: {
     paddingHorizontal: 16,
     gap: 20,

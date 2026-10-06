@@ -137,9 +137,9 @@ export default function AchievementsScreen() {
       <Stack.Screen
         options={{
           title: 'Достижения',
-          presentation: 'modal',
-          headerTransparent: true,
           headerTintColor: COLORS.text,
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
           headerTitleStyle: {
             fontFamily: 'Nunito_700Bold',
             color: COLORS.text,
@@ -150,7 +150,7 @@ export default function AchievementsScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 24 },
+          { paddingTop: 16, paddingBottom: insets.bottom + 24 },
         ]}
         showsVerticalScrollIndicator={false}
       >

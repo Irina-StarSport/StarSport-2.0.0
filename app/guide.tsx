@@ -35,9 +35,9 @@ export default function GuideScreen() {
       <Stack.Screen
         options={{
           title: 'Руководство',
-          presentation: 'modal',
-          headerTransparent: true,
           headerTintColor: COLORS.text,
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
           headerTitleStyle: {
             fontFamily: 'Nunito_700Bold',
             color: COLORS.text,
@@ -49,7 +49,7 @@ export default function GuideScreen() {
         style={{ opacity }}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 24 },
+          { paddingTop: 16, paddingBottom: insets.bottom + 24 },
         ]}
         showsVerticalScrollIndicator={false}
       >

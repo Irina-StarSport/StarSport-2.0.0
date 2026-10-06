@@ -122,6 +122,7 @@ export default function RootLayout() {
                       title: 'Достижения',
                       headerTintColor: COLORS.text,
                       headerStyle: { backgroundColor: COLORS.background },
+                      headerShadowVisible: false,
                     }}
                   />
                   <Stack.Screen
@@ -144,7 +145,17 @@ export default function RootLayout() {
                       headerStyle: { backgroundColor: COLORS.background },
                     }}
                   />
-                  <Stack.Screen name="shop" options={{ presentation: 'modal', headerShown: false }} />
+                  <Stack.Screen
+                    name="shop"
+                    options={{
+                      presentation: 'modal',
+                      headerShown: true,
+                      title: 'Магазин наград',
+                      headerTintColor: COLORS.text,
+                      headerStyle: { backgroundColor: COLORS.background },
+                      headerShadowVisible: false,
+                    }}
+                  />
                   <Stack.Screen name="settings" options={{ presentation: 'modal', headerShown: false }} />
                 </Stack>
                 <SystemBars style="light" />
