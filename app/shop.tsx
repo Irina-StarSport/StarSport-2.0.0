@@ -7,7 +7,6 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { AnimatedPressable } from '@/components/AnimatedPressable';
@@ -147,11 +146,6 @@ export default function ShopScreen() {
 
   return (
     <CosmicBackground style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerRight: () => <StarCounter count={totalStars} size="small" />,
-        }}
-      />
 
       <ScrollView
         contentContainerStyle={[

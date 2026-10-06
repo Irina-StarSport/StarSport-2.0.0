@@ -5,8 +5,8 @@ import {
   ScrollView,
   StyleSheet,
   Animated,
+  Platform,
 } from 'react-native';
-import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { StarCounter } from '@/components/StarCounter';
@@ -116,14 +116,14 @@ export default function AchievementsScreen() {
     Animated.parallel([
       Animated.spring(headerScale, {
         toValue: 1,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
         speed: 12,
         bounciness: 8,
       }),
       Animated.timing(headerOpacity, {
         toValue: 1,
         duration: 400,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }),
     ]).start();
   }, []);
@@ -134,18 +134,6 @@ export default function AchievementsScreen() {
 
   return (
     <CosmicBackground style={styles.container}>
-      <Stack.Screen
-        options={{
-          title: 'Достижения',
-          headerTintColor: COLORS.text,
-          headerStyle: { backgroundColor: COLORS.background },
-          headerShadowVisible: false,
-          headerTitleStyle: {
-            fontFamily: 'Nunito_700Bold',
-            color: COLORS.text,
-          },
-        }}
-      />
 
       <ScrollView
         contentContainerStyle={[
@@ -226,12 +214,12 @@ function AchievementBadge({
         toValue: 1,
         duration: 350,
         delay: index * 50,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }),
       Animated.spring(scale, {
         toValue: 1,
         delay: index * 50,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
         speed: 14,
         bounciness: 6,
       }),

@@ -5,8 +5,8 @@ import {
   ScrollView,
   StyleSheet,
   Animated,
+  Platform,
 } from 'react-native';
-import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { COLORS } from '@/constants/SpaceColors';
@@ -26,24 +26,12 @@ export default function GuideScreen() {
     Animated.timing(opacity, {
       toValue: 1,
       duration: 400,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
     }).start();
   }, []);
 
   return (
     <CosmicBackground style={styles.container}>
-      <Stack.Screen
-        options={{
-          title: 'Руководство',
-          headerTintColor: COLORS.text,
-          headerStyle: { backgroundColor: COLORS.background },
-          headerShadowVisible: false,
-          headerTitleStyle: {
-            fontFamily: 'Nunito_700Bold',
-            color: COLORS.text,
-          },
-        }}
-      />
 
       <Animated.ScrollView
         style={{ opacity }}

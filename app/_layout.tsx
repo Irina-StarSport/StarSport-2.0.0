@@ -143,6 +143,7 @@ export default function RootLayout() {
                       title: 'Руководство',
                       headerTintColor: COLORS.text,
                       headerStyle: { backgroundColor: COLORS.background },
+                      headerShadowVisible: false,
                     }}
                   />
                   <Stack.Screen
