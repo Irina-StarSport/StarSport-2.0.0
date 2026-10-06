@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { useAudioPlayer } from 'expo-audio';
 import * as MediaLibrary from 'expo-media-library';
+import * as DocumentPicker from 'expo-document-picker';
 
 export interface Track {
   id: string;
@@ -34,6 +35,7 @@ interface MusicContextType {
   requestPermission: () => Promise<void>;
   volume: number;
   setVolume: (v: number) => void;
+  addDeviceTracks: (assets: DocumentPicker.DocumentPickerAsset[]) => void;
 }
 
 const MusicContext = createContext<MusicContextType | null>(null);
@@ -203,6 +205,22 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
+  const addDeviceTracks = useCallback((assets: DocumentPicker.DocumentPickerAsset[]) => {
+    console.log(`[MusicContext] addDeviceTracks called with ${assets.length} asset(s)`);
+    const newTracks: Track[] = assets.map((asset) => ({
+      id: asset.uri,
+      name: (asset.name ?? asset.uri).replace(/\.[^/.]+$/, ''),
+      uri: asset.uri,
+      isPreset: false,
+    }));
+    setDeviceTracks((prev) => {
+      const existingUris = new Set(prev.map((t) => t.uri));
+      const unique = newTracks.filter((t) => !existingUris.has(t.uri));
+      console.log(`[MusicContext] addDeviceTracks: ${unique.length} new unique track(s) appended`);
+      return [...prev, ...unique];
+    });
+  }, []);
+
   const loadMoreTracks = useCallback(() => {
     console.log('[MusicContext] loadMoreTracks called, endCursor=', endCursor);
     if (hasMoreTracks && endCursor && !isLoadingTracks) {
@@ -273,6 +291,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         requestPermission,
         volume,
         setVolume,
+        addDeviceTracks,
       }}
     >
       <AudioEngine

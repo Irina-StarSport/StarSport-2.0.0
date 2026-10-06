@@ -7,6 +7,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CosmicBackground } from '@/components/CosmicBackground';
 import { COLORS } from '@/constants/SpaceColors';
@@ -20,7 +21,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { totalStars, resetProgress } = useProgress();
   const { settings, updateTextSize, updateLanguage, textScale } = useSettings();
-  const { volume, setVolume } = useMusic();
+  const { volume, setVolume, addDeviceTracks } = useMusic();
 
   const handleResetProgress = () => {
     console.log('[SettingsScreen] reset progress pressed');
@@ -160,9 +161,27 @@ export default function SettingsScreen() {
           </Text>
           <TouchableOpacity
             style={styles.musicButton}
-            onPress={() => {
+            onPress={async () => {
               console.log('[SettingsScreen] open media library pressed');
-              Alert.alert('Медиатека', 'Перейдите в раздел Музыка в нижней панели для выбора треков с устройства');
+              try {
+                const result = await DocumentPicker.getDocumentAsync({
+                  type: 'audio/*',
+                  multiple: true,
+                  copyToCacheDirectory: false,
+                });
+                console.log('[SettingsScreen] DocumentPicker result:', result);
+                if (!result.canceled && result.assets && result.assets.length > 0) {
+                  addDeviceTracks(result.assets);
+                  Alert.alert(
+                    '✅ Треки добавлены',
+                    `Добавлено ${result.assets.length} ${result.assets.length === 1 ? 'трек' : 'треков'}. Откройте раздел Музыка для воспроизведения.`,
+                    [{ text: 'OK' }]
+                  );
+                }
+              } catch (err) {
+                console.log('[SettingsScreen] DocumentPicker error:', err);
+                Alert.alert('Ошибка', 'Не удалось открыть медиатеку. Попробуйте ещё раз.');
+              }
             }}
             activeOpacity={0.75}
           >
