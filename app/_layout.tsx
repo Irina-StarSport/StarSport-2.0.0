@@ -26,18 +26,15 @@ import {
 } from "@expo-google-fonts/nunito";
 import { COLORS } from "@/constants/SpaceColors";
 
-const DevErrorBoundary = __DEV__
-  ? ErrorBoundary
-  : ({ children }: { children: React.ReactNode }) => <>{children}</>;
-
 // Global unhandled promise rejection handler
-if (typeof global !== 'undefined') {
-  const originalHandler = (global as typeof global & { onunhandledrejection?: (event: { reason: unknown }) => void }).onunhandledrejection;
-  (global as typeof global & { onunhandledrejection?: (event: { reason: unknown }) => void }).onunhandledrejection = (event: { reason: unknown }) => {
+try {
+  const g = global as any;
+  const prev = g.onunhandledrejection;
+  g.onunhandledrejection = (event: any) => {
     console.error('[GlobalHandler] Unhandled promise rejection:', event?.reason);
-    if (originalHandler) originalHandler(event);
+    if (prev) prev(event);
   };
-}
+} catch (_) {}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -78,7 +75,6 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
-    <DevErrorBoundary>
       <StatusBar style="light" animated />
       <ThemeProvider value={SpaceTheme}>
         <SafeAreaProvider>
@@ -168,7 +164,6 @@ export default function RootLayout() {
           </SettingsProvider>
         </SafeAreaProvider>
       </ThemeProvider>
-    </DevErrorBoundary>
     </ErrorBoundary>
   );
 }

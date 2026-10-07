@@ -29,12 +29,13 @@
       },
       "package": "com.starsport.app",
       "versionCode": 26,
+      "targetSdkVersion": 35,
+      "compileSdkVersion": 35,
       "permissions": [
         "android.permission.READ_MEDIA_AUDIO",
         "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.INTERNET",
-        "READ_MEDIA_IMAGES"
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.INTERNET"
       ],
       "usesCleartextTraffic": false
     },

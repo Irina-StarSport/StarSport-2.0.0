@@ -14,7 +14,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    loadSettings().then(setSettings);
+    loadSettings()
+      .then(setSettings)
+      .catch((e) => {
+        console.warn('[SettingsContext] failed to load settings, using defaults:', e);
+      });
   }, []);
 
   const updateTextSize = useCallback((size: AppSettings['textSize']) => {

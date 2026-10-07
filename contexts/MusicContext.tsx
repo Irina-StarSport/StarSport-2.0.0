@@ -203,26 +203,30 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   // On startup: load persisted picker tracks, then check MediaLibrary permission
   useEffect(() => {
     (async () => {
-      // Load persisted DocumentPicker tracks
       try {
-        const saved = await AsyncStorage.getItem(DEVICE_TRACKS_KEY);
-        if (saved) {
-          const parsed: Track[] = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            console.log(`[MusicContext] restored ${parsed.length} picker track(s) from AsyncStorage`);
-            setPickerTracks(parsed);
+        // Load persisted DocumentPicker tracks
+        try {
+          const saved = await AsyncStorage.getItem(DEVICE_TRACKS_KEY);
+          if (saved) {
+            const parsed: Track[] = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              console.log(`[MusicContext] restored ${parsed.length} picker track(s) from AsyncStorage`);
+              setPickerTracks(parsed);
+            }
           }
+        } catch (e) {
+          console.log('[MusicContext] failed to load saved tracks:', e);
+        }
+        // Existing permission check
+        console.log('[MusicContext] checking existing permissions');
+        const { status } = await MediaLibrary.getPermissionsAsync();
+        console.log('[MusicContext] existing permission status:', status);
+        setPermissionStatus(status);
+        if (status === MediaLibrary.PermissionStatus.GRANTED) {
+          await loadTracks();
         }
       } catch (e) {
-        console.log('[MusicContext] failed to load saved tracks:', e);
-      }
-      // Existing permission check
-      console.log('[MusicContext] checking existing permissions');
-      const { status } = await MediaLibrary.getPermissionsAsync();
-      console.log('[MusicContext] existing permission status:', status);
-      setPermissionStatus(status);
-      if (status === MediaLibrary.PermissionStatus.GRANTED) {
-        await loadTracks();
+        console.log('[MusicContext] startup error (non-fatal):', e);
       }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,7 +1,11 @@
 // Initialize Newly console log capture before anything else
-import './utils/errorLogger';
+try {
+  require('./utils/errorLogger');
+} catch (_) {}
 
 // Polyfills
-import './utils/polyfills/alert';
+try {
+  require('./utils/polyfills/alert');
+} catch (_) {}
 
 import 'expo-router/entry';
