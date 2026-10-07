@@ -235,14 +235,7 @@ export default function SettingsScreen() {
                         style={styles.trackDeleteBtn}
                         onPress={() => {
                           console.log(`[SettingsScreen] delete track pressed: ${track.name}`);
-                          Alert.alert('Удалить трек?', track.name, [
-                            { text: 'Отмена', style: 'cancel' },
-                            {
-                              text: 'Удалить',
-                              style: 'destructive',
-                              onPress: () => removeTrack(track.id),
-                            },
-                          ]);
+                          removeTrack(track.id);
                         }}
                         activeOpacity={0.75}
                       >
