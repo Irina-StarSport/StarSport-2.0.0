@@ -21,7 +21,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { totalStars, resetProgress } = useProgress();
   const { settings, updateTextSize, updateLanguage, textScale } = useSettings();
-  const { volume, setVolume, addDeviceTracks, deviceTracks, play, pause, isPlaying, currentTrack } = useMusic();
+  const { volume, setVolume, addDeviceTracks, removeTrack, deviceTracks, play, pause, isPlaying, currentTrack } = useMusic();
 
   const handleResetProgress = () => {
     console.log('[SettingsScreen] reset progress pressed');
@@ -231,6 +231,23 @@ export default function SettingsScreen() {
                           <Text style={[styles.trackPlay, isActive && styles.trackPlayActive]}>▶</Text>
                         </TouchableOpacity>
                       )}
+                      <TouchableOpacity
+                        style={styles.trackDeleteBtn}
+                        onPress={() => {
+                          console.log(`[SettingsScreen] delete track pressed: ${track.name}`);
+                          Alert.alert('Удалить трек?', track.name, [
+                            { text: 'Отмена', style: 'cancel' },
+                            {
+                              text: 'Удалить',
+                              style: 'destructive',
+                              onPress: () => removeTrack(track.id),
+                            },
+                          ]);
+                        }}
+                        activeOpacity={0.75}
+                      >
+                        <Text style={styles.trackDelete}>🗑</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 );
@@ -478,7 +495,15 @@ const styles = StyleSheet.create({
   trackControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
+  },
+  trackDeleteBtn: {
+    marginLeft: 8,
+    padding: 4,
+  },
+  trackDelete: {
+    fontSize: 16,
+    color: COLORS.danger ?? '#ff4444',
   },
   trackPlay: {
     fontSize: 12,

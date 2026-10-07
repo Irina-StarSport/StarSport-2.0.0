@@ -37,6 +37,7 @@ interface MusicContextType {
   volume: number;
   setVolume: (v: number) => void;
   addDeviceTracks: (assets: DocumentPicker.DocumentPickerAsset[]) => void;
+  removeTrack: (trackId: string) => void;
 }
 
 const MusicContext = createContext<MusicContextType | null>(null);
@@ -250,6 +251,18 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const removeTrack = useCallback((trackId: string) => {
+    console.log(`[MusicContext] removeTrack: ${trackId}`);
+    setPickerTracks((prev) => prev.filter((t) => t.id !== trackId));
+    setCurrentTrack((prev) => {
+      if (prev?.id === trackId) {
+        setIsPlaying(false);
+        return null;
+      }
+      return prev;
+    });
+  }, []);
+
   const loadMoreTracks = useCallback(() => {
     console.log('[MusicContext] loadMoreTracks called, endCursor=', endCursor);
     if (hasMoreTracks && endCursor && !isLoadingTracks) {
@@ -325,6 +338,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         volume,
         setVolume,
         addDeviceTracks,
+        removeTrack,
       }}
     >
       <AudioEngine
