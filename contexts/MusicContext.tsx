@@ -53,37 +53,34 @@ interface AudioEngineProps {
 }
 
 function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
-  // Always call with a static null so the hook argument never changes (Rules of Hooks).
-  // Use player.replace() to swap the audio source safely.
-  const player = useAudioPlayer(null);
+  // Initialise with the URI directly when available so that on first mount
+  // (e.g. after AsyncStorage restore + play) the player already has a source.
+  const player = useAudioPlayer(uri ? { uri } : null);
 
-  // Track URI changes: pause → replace → play
+  // Track URI changes: await replace() before calling play() so the source is
+  // fully loaded before playback starts.
   useEffect(() => {
     console.log('[AudioEngine] uri changed:', uri);
-    try {
-      player.pause();
-      if (uri) {
-        player.replace({ uri });
+    if (!uri) {
+      try { player.pause(); } catch (e) {}
+      return;
+    }
+    (async () => {
+      try {
+        await player.replace({ uri });
+        player.loop = true;
         if (isPlaying) {
           console.log('[AudioEngine] uri changed — calling player.play()');
           player.play();
-          player.loop = true;
         }
-      }
-    } catch (e) {
-      console.log('[AudioEngine] error on uri change:', e);
-    }
-    return () => {
-      try {
-        player.pause();
       } catch (e) {
-        console.log('[AudioEngine] error on uri cleanup:', e);
+        console.log('[AudioEngine] error on uri change:', e);
       }
-    };
+    })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uri]);
 
-  // isPlaying changes: play or pause
+  // isPlaying changes: play or pause (guard that a source is loaded first)
   useEffect(() => {
     if (!uri) return;
     try {
