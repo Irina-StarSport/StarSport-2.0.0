@@ -171,7 +171,7 @@ export default function SettingsScreen() {
                 });
                 console.log('[SettingsScreen] DocumentPicker result:', result);
                 if (!result.canceled && result.assets && result.assets.length > 0) {
-                  addDeviceTracks(result.assets);
+                  await addDeviceTracks(result.assets);
                   console.log(`[SettingsScreen] added ${result.assets.length} track(s)`);
                 }
               } catch (err) {

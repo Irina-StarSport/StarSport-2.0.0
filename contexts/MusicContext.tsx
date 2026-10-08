@@ -36,7 +36,7 @@ interface MusicContextType {
   requestPermission: () => Promise<void>;
   volume: number;
   setVolume: (v: number) => void;
-  addDeviceTracks: (assets: DocumentPicker.DocumentPickerAsset[]) => void;
+  addDeviceTracks: (assets: DocumentPicker.DocumentPickerAsset[]) => Promise<void>;
   removeTrack: (trackId: string) => void;
 }
 
@@ -126,6 +126,17 @@ function AudioEngine({ uri, isPlaying, volume }: AudioEngineProps) {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+async function blobUriToDataUri(blobUri: string): Promise<string> {
+  const response = await fetch(blobUri);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
@@ -206,9 +217,12 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
           const saved = await AsyncStorage.getItem(DEVICE_TRACKS_KEY);
           if (saved) {
             const parsed: Track[] = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              console.log(`[MusicContext] restored ${parsed.length} picker track(s) from AsyncStorage`);
-              setPickerTracks(parsed);
+            if (Array.isArray(parsed)) {
+              const valid = parsed.filter((t: Track) => t.uri && !t.uri.startsWith('blob:'));
+              console.log(`[MusicContext] restored ${valid.length} picker track(s) from AsyncStorage (filtered ${parsed.length - valid.length} stale blob: URI(s))`);
+              if (valid.length > 0) {
+                setPickerTracks(valid);
+              }
             }
           }
         } catch (e) {
@@ -236,17 +250,29 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     });
   }, [pickerTracks]);
 
-  const addDeviceTracks = useCallback((assets: DocumentPicker.DocumentPickerAsset[]) => {
+  const addDeviceTracks = useCallback(async (assets: DocumentPicker.DocumentPickerAsset[]) => {
     console.log(`[MusicContext] addDeviceTracks called with ${assets.length} asset(s)`);
-    const newTracks: Track[] = assets.map((asset) => ({
-      id: asset.uri,
-      name: (asset.name ?? asset.uri).replace(/\.[^/.]+$/, ''),
-      uri: asset.uri,
-      isPreset: false,
+    const newTracks: Track[] = await Promise.all(assets.map(async (asset) => {
+      let uri = asset.uri;
+      try {
+        if (uri && uri.startsWith('blob:')) {
+          console.log('[MusicContext] converting blob: URI to data: URI for', asset.name ?? asset.uri);
+          uri = await blobUriToDataUri(uri);
+          console.log('[MusicContext] blob: URI converted successfully for', asset.name ?? asset.uri);
+        }
+      } catch (e) {
+        console.log('[MusicContext] failed to convert blob URI:', e);
+      }
+      return {
+        id: asset.uri, // keep original uri as id for dedup
+        name: (asset.name ?? asset.uri).replace(/\.[^/.]+$/, ''),
+        uri,
+        isPreset: false,
+      };
     }));
     setPickerTracks((prev) => {
-      const existingUris = new Set(prev.map((t) => t.uri));
-      const unique = newTracks.filter((t) => !existingUris.has(t.uri));
+      const existingIds = new Set(prev.map((t) => t.id));
+      const unique = newTracks.filter((t) => !existingIds.has(t.id));
       console.log(`[MusicContext] addDeviceTracks: ${unique.length} new unique track(s) appended`);
       return [...prev, ...unique];
     });
